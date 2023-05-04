@@ -22,7 +22,6 @@ public class MainCommand {
 	}
 
 	// TODO: Make sure this is the right place for this.
-	// Add data structure to hold parsed config.
 	public static synchronized void init() {
 		// TODO Parse the config file to get startup options for Solr
 	}
