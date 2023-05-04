@@ -21,7 +21,7 @@ public class StartCommand implements Runnable {
 	@Option(names = { "-h", "--heap" }, description = "Solr Heap Size (values like 4g)")
 	String heap = CLIConstants.DEFAULT_SOLR_HEAP;
 
-	@Option(names = { "-p", "--listenPort" }, description = "Solr Listen Port")
+	@Option(names = { "-p", "--listen-port" }, description = "Solr Listen Port")
 	int listenPort = CLIConstants.DEFAULT_SOLR_PORT;
 
 	@Option(names = { "-sp", "--stop-port" }, description = "Solr Stop Port")
