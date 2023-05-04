@@ -1,0 +1,189 @@
+#!/usr/bin/env bash
+
+# Licensed to the Apache Software Foundation (ASF) under one or more
+# contributor license agreements.  See the NOTICE file distributed with
+# this work for additional information regarding copyright ownership.
+# The ASF licenses this file to You under the Apache License, Version 2.0
+# (the "License"); you may not use this file except in compliance with
+# the License.  You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+REQUIRED_PROGS=(which realpath lsof gzip mktemp)
+MINIMUM_JAVA_MAJOR_VERSION="11"
+JAR_FILE="solrcli.jar"
+LOG_FILE="solrcli.log"
+CONTROL_HEAP="128m"
+
+function cleanup_and_exit() {
+  local EXITCODE var
+  EXITCODE="$1"
+  shift
+
+  if [ -z "${EXITCODE}" ]; then
+    EXITCODE="0"
+  fi
+
+  for var in "${TMPVARS[@]}"
+  do
+    rm -f "${!var}"
+  done
+
+  exit "${EXITCODE}"
+}
+
+function assign_temp_file() {
+  local TMPFILENAME VARNAME
+  VARNAME="$1"
+  shift
+  TMPFILENAME="$(mktemp)"
+  rm -f "${TMPFILENAME}"
+  eval "${VARNAME}"="$TMPFILENAME"
+  TMPVARS+=("${VARNAME}")
+  # debugging
+  #log_warn "${VARNAME}=\"${TMPFILENAME}\""
+}
+
+function get_timestamp() {
+  date "+%4Y-%m-%dT%H:%M:%S"
+}
+
+function log_DEBUG() {
+  echo -e "DEBUG $(get_timestamp): $*"
+}
+
+function log_info() {
+  echo -e "INFO  $(get_timestamp): $*"
+}
+
+function log_warn() {
+  echo -e "WARN  $(get_timestamp): $*"
+}
+
+function log_err() {
+  echo -e "ERROR $(get_timestamp): $*" >> /dev/stderr
+}
+
+function print_java_paths_stderr() {
+  if [ -n "${SOLR_JAVA_HOME}" ]; then
+    log_err "JAVA_HOME initialized from SOLR_JAVA_HOME"
+    log_err "SOLR_JAVA_HOME=\"${SOLR_JAVA_HOME}\""
+  elif [ -n "${JAVA_HOME_DERIVED}" ]; then
+    log_err "JAVA_HOME was derived from java on the path"
+  else
+    log_err "JAVA_HOME was explicitly set"
+  fi
+  log_err "JAVA_HOME=\"${JAVA_HOME}\""
+  log_err "JAVA_BIN=\"${JAVA_BIN}\""
+}
+
+function die() {
+  print_java_paths_stderr
+  log_err "$*"
+  cleanup_and_exit 1
+}
+
+function find_java_home() {
+  local JAVA_PATH JAVA_REALPATH JAVA_SUBDIR JAVA_DIR
+  if [ -n "${SOLR_JAVA_HOME}" ]; then
+    JAVA_HOME="${SOLR_JAVA_HOME}"
+  fi
+  if [ -z "${JAVA_HOME}" ]; then
+    JAVA_PATH="$(which java)"
+    RET="$?"
+    if [ "$RET" -eq 0 ]; then
+      JAVA_REALPATH="$(realpath "${JAVA_PATH}")"
+      JAVA_SUBDIR="$(dirname "${JAVA_REALPATH}")"
+      JAVA_DIR="$(dirname "${JAVA_SUBDIR}")"
+      JAVA_HOME="$(cd "${JAVA_DIR}" || exit ; pwd -P)"
+      JAVA_HOME_DERIVED="true"
+    fi
+  fi
+
+  JAVA_BIN="${JAVA_HOME}/bin/java"
+  if [ ! -x "${JAVA_BIN}" ]; then
+    die "No executable found at ${JAVA_BIN}"
+  fi
+
+  # This does not actually check the Java version.  It just makes sure Java can run.
+  "${JAVA_BIN}" -Xmx4m -XX:+CrashOnOutOfMemoryError -version > /dev/null 2>&1
+  RET="$?"
+  if [ "$RET" -ne 0 ]; then
+    die "Running ${JAVA_BIN} with basic options failed."
+  fi
+
+  export JAVA_BIN
+  export JAVA_HOME
+}
+
+function check_required_progs() {
+  local PROG PROG_MISSING
+  for PROG in "${REQUIRED_PROGS[@]}"
+  do
+    if [ ! -x "$(which "${PROG}")" ]; then
+      log_err "Required program ${PROG} not in PATH!"
+      PROG_MISSING="true"
+    fi
+  done
+  if [ -n "${PROG_MISSING}" ]; then
+    die "Aborting."
+  fi
+
+}
+
+function rotate_logs() {
+  if [ -z "${FULL_LOG_FILE}" ]; then
+    die "Rotating logs failed.  FULL_LOG_FILE is not defined."
+  fi
+  mv -f "${FULL_LOG_FILE}.8.gz" "${FULL_LOG_FILE}.9.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.7.gz" "${FULL_LOG_FILE}.8.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.6.gz" "${FULL_LOG_FILE}.7.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.5.gz" "${FULL_LOG_FILE}.6.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.4.gz" "${FULL_LOG_FILE}.5.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.3.gz" "${FULL_LOG_FILE}.4.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.2.gz" "${FULL_LOG_FILE}.3.gz" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}.1" "${FULL_LOG_FILE}.2" 2> /dev/null
+  gzip -9 "${FULL_LOG_FILE}.2" 2> /dev/null
+  mv -f "${FULL_LOG_FILE}" "${FULL_LOG_FILE}.1" 2> /dev/null
+}
+
+TMPVARS=()
+SCRIPT_DIR="$(cd "$(dirname "$0")" || exit ; pwd -P)"
+cd "${SCRIPT_DIR}" || die "Can't cd to script directory ${SCRIPT_DIR}"
+
+find_java_home
+check_required_progs
+assign_temp_file "TMPFILE1"
+
+# Run the application with options that do nothing and exit.
+# This is just to make sure that Java is new enough.
+"${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info > "${TMPFILE1}" 2>&1
+RET="$?"
+UNSUPPORTED="$(grep -c "UnsupportedClassVersionError" "${TMPFILE1}")"
+
+if [ "${RET}" -ne 0 ] && [ "${UNSUPPORTED}" -gt 0 ]; then
+  die "Java not new enough.  Minimum major version is ${MINIMUM_JAVA_MAJOR_VERSION}."
+fi
+
+# Run the application with an option to print the log directory and immediately exit.
+LOG_DIR="$("${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> /dev/null)"
+RET="$?"
+if [ "${RET}" -ne 0 ]; then
+  die "Getting the log directory failed."
+fi
+FULL_LOG_FILE="${LOG_DIR}/${LOG_FILE}"
+
+rotate_logs
+
+# Run the application for real with all the options given to this script.
+"${JAVA_BIN}" "-Xms${CONTROL_HEAP}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" "$@" > "${FULL_LOG_FILE}" 2>&1
+
+echo "JAVA_HOME=\"${JAVA_HOME}\""
+echo "JAVA_BIN=\"${JAVA_BIN}\""
+cleanup_and_exit
