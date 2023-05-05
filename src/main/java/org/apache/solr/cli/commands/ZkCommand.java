@@ -1,7 +1,6 @@
 package org.apache.solr.cli.commands;
 
 import picocli.CommandLine.Command;
-import picocli.CommandLine.Option;
 
 @Command(name = "zk", subcommands = {
         ZkCpCommand.class,
