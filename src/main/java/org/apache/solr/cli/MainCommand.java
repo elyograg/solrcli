@@ -26,12 +26,12 @@ public class MainCommand {
 		// TODO Parse the config file to get startup options for Solr
 	}
 
-	public static void halt(int... code) {
+	public static void exit(int... code) {
 		int exitCode = 0;
 		if (code.length > 0) {
 			exitCode = code[0];
 		}
-		Runtime.getRuntime().halt(exitCode);
+		System.exit(exitCode);
 	}
 
 	public static void main(String[] args) {

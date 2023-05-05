@@ -33,14 +33,16 @@ public class InfoCommand implements Runnable {
 		verbose.set(verboseFlag);
 
 		if (exitFlag) {
-			MainCommand.halt();
+			log.warn("Exiting program as requested");
+			MainCommand.exit();
 		}
 
 		if (getLogDir) {
 			// TODO: Once the init() function is done, actually return
 			// configured log dir.
+			log.info("Obtaining log directory");
 			System.out.println("/tmp/cli_log");
-			MainCommand.halt();
+			MainCommand.exit();
 		}
 
 		log.info("Starting info command");

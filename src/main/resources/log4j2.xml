@@ -18,7 +18,7 @@
 <?xml-model href=""?>
 <Configuration>
   <Appenders>
-    <Console name="STDOUT" target="SYSTEM_OUT">
+    <Console name="STDERR" target="SYSTEM_ERR">
       <PatternLayout>
         <Pattern>
           %maxLen{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p (%t) %c{1.} %m%notEmpty{ =>%ex{short}}}{10240}%n
@@ -29,7 +29,7 @@
   <Loggers>
     <AsyncLogger name="some.package.name" level="warn"/>
     <AsyncRoot level="debug">
-      <AppenderRef ref="STDOUT"/>
+      <AppenderRef ref="STDERR"/>
     </AsyncRoot>
   </Loggers>
 </Configuration>

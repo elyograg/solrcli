@@ -163,7 +163,7 @@ assign_temp_file "TMPFILE1"
 
 # Run the application with options that do nothing and exit.
 # This is just to make sure that Java is new enough.
-"${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info > "${TMPFILE1}" 2>&1
+"${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info --exit > "${TMPFILE1}" 2>&1
 RET="$?"
 UNSUPPORTED="$(grep -c "UnsupportedClassVersionError" "${TMPFILE1}")"
 
