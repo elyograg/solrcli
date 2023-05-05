@@ -1,7 +1,5 @@
 plugins {
 	id 'java'
-	id 'org.springframework.boot' version '2.7.11'
-	id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'org.apache.solr'
@@ -13,9 +11,6 @@ repositories {
 }
 
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter'
-	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	
 	implementation group: 'info.picocli', name: 'picocli', version: '4+'
 	implementation group: 'org.slf4j', name: 'slf4j-api', version: '1.7+'
 	implementation group: 'org.slf4j', name: 'jcl-over-slf4j', version: '1.7+'
@@ -23,8 +18,7 @@ dependencies {
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-slf4j-impl', version: '2+'
 	implementation group: 'org.apache.logging.log4j', name: 'log4j-1.2-api', version: '2+'
 	implementation group: 'com.lmax', name: 'disruptor', version: '3+'
-	//implementation group: 'commons-cli', name: 'commons-cli', version: '1.5.0'
-	//testImplementation group: 'org.junit', name: 'junit', version: '4+'
+    testImplementation('junit:junit:4+')
 }
 
 configurations.all {
@@ -36,4 +30,16 @@ configurations.all {
 
 tasks.named('test') {
 	useJUnitPlatform()
+}
+
+task fatJar(type: Jar) {
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+	manifest {
+        attributes 'Implementation-Title': 'Gradle Jar File Example',  
+        	'Implementation-Version': version,
+        	'Main-Class': 'org.apache.solr.cli.MainCommand'
+    }
+    baseName = project.name + '-all'
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
+    with jar
 }
