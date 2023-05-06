@@ -12,32 +12,30 @@ import picocli.CommandLine.Option;
 
 @Command(name = "stop", separator = " ", header = "Stop Solr", description = "Stops one or more Solr instances.")
 public final class StopCommand implements Runnable {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	@ArgGroup(multiplicity = "1")
-	private static StopPorts stopPorts;
+  @ArgGroup(multiplicity = "1")
+  private static StopPorts stopPorts;
 
-	private static final class StopPorts {
-		@Option(names = { "-all", }, arity = "0", description = "Find and stop all running Solr servers on this host.")
-		boolean stopAll;
+  private static final class StopPorts {
+    @Option(names = {
+        "-all", }, arity = "0", description = "Find and stop all running Solr servers on this host.")
+    boolean stopAll;
 
-		@Option(names = { "-p",
-				"--port" }, arity = "1", description = "Specify the port the Solr HTTP listener is bound to.")
-		String port;
-	}
+    @Option(names = { "-p",
+        "--port" }, arity = "1", description = "Specify the port the Solr HTTP listener is bound to.")
+    String port;
+  }
 
-	@Option(names = { "-v", "--verbose", "--d", "--debug" }, arity = "0", description = "Log all debug messages.")
-	boolean verbose;
+  @Option(names = { "-k",
+      "--stop-key" }, arity = "1", description = "Stop key; default is 'SolrRocks' or what's defined in the config.")
+  String stopKey;
 
-	@Option(names = { "-k",
-			"--stop-key" }, arity = "1", description = "Stop key; default is 'SolrRocks' or what's defined in the config.")
-	String stopKey;
+  @Override
+  public void run() {
+    stopKey = MainConfig.getStopKey();
+    log.info("Beginning start command.");
 
-	@Override
-	public void run() {
-		stopKey = MainConfig.getStopKey();
-		log.info("Beginning start command.");
-
-		// TODO: implement!
-	}
+    // TODO: implement!
+  }
 }

@@ -11,18 +11,18 @@ import picocli.CommandLine.Parameters;
 
 @Command(name = "rm", separator = " ", header = "Delete a file ZooKeeper", description = "Delete file", footer = "\nThe deleteFile argument will be treated as if it has the 'zk:' prefix.  You can explicitly add that prefix if you wish.")
 public class ZkRmCommand implements Runnable {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	@Option(names = { "-z", "--zkhost" }, description = "ZK connection string", required = true)
-	String zkHost;
-	@Option(names = { "-r", "--recursive" }, description = "Recursively delete a directory")
-	boolean recursive;
-	@Parameters(index = "0", description = "File to delete.  Example: zk:/security.json")
-    String deleteFile;
+  @Option(names = { "-z", "--zkhost" }, description = "ZK connection string", required = true)
+  String zkHost;
+  @Option(names = { "-r", "--recursive" }, description = "Recursively delete a directory")
+  boolean recursive;
+  @Parameters(index = "0", description = "File to delete.  Example: zk:/security.json")
+  String deleteFile;
 
-	@Override
-	public void run() {
-		log.info("Starting zk rm command");
-		// TODO: Validate zk: prefix usage.
-	}
+  @Override
+  public void run() {
+    log.info("Starting zk rm command");
+    // TODO: Validate zk: prefix usage.
+  }
 }

@@ -8,10 +8,10 @@ import org.slf4j.LoggerFactory;
 
 //@SpringBootTest
 class MainCommandTests {
-	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+  private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-	@Test
-	void contextLoads() {
-		log.info("Testing!");
-	}
+  @Test
+  void contextLoads() {
+    log.info("Testing!");
+  }
 }
