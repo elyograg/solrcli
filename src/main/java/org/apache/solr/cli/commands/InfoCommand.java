@@ -23,7 +23,7 @@ public class InfoCommand implements Runnable {
 				"--exit" }, description = "Immediately exit.  Mostly used to ensure the application can run.")
 		private static boolean exitFlag;
 
-		@Option(names = { "-ld", "--logdir" }, description = "Print logging directory to stdout")
+		@Option(names = { "-ld", "--logdir" }, description = "Print logging directory to stdout and exit.")
 		private static boolean getLogDir;
 	}
 
@@ -45,3 +45,4 @@ public class InfoCommand implements Runnable {
 		log.info("Starting info command");
 	}
 }
+ 

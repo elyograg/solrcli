@@ -17,13 +17,22 @@ import picocli.CommandLine.Help.ColorScheme;
 import picocli.CommandLine.IHelpFactory;
 import picocli.CommandLine.Model.ArgSpec;
 import picocli.CommandLine.Model.CommandSpec;
+import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 
-@Command(name = "solr", scope = ScopeType.INHERIT, header = "Solr Control Script", description = "A script that controls Solr and related functionality.", version = "9.3.0", synopsisSubcommandLabel = "COMMAND", subcommands = {
+@Command(name = "solr", separator = " ", scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", version = "9.3.0", synopsisSubcommandLabel = "COMMAND", subcommands = {
 		InfoCommand.class, ZkCommand.class, StartCommand.class, StopCommand.class })
 public final class MainCommand {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 	private static CommandLine cmdLine;
+
+	@Option(names = { "-h",
+			"--help" }, arity = "0", usageHelp = true, scope = ScopeType.INHERIT, description = "Display command usage.")
+	boolean help;
+
+	@Option(names = { "-config",
+			"--config" }, arity = "1", scope = ScopeType.INHERIT, description = "The location of the cross-platform config file.")
+	private static String configFile;
 
 	public static final void main(final String[] args) {
 		if (!MainConfig.validateConfig()) {

@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "start", separator = " ", header = "Start Solr", description = "Start Solr")
+@Command(name = "start", separator = " ", header = "Start Solr", description = "Starts an instance of Solr")
 public class StartCommand implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -31,14 +31,15 @@ public class StartCommand implements Runnable {
 			"--heap" }, arity = "1", defaultValue = "512m", description = "Solr Heap Size (values like 4g).")
 	private static String heapSize;
 
-	@Option(names = { "-gc", "--gc" }, arity = "1", defaultValue = "g1", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default g1")
+	@Option(names = { "-gc",
+			"--gc" }, arity = "1", defaultValue = "g1", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default g1")
 	private static GcType gcName;
 
 	@Option(names = { "-p",
-			"--listen-port" }, arity = "1", defaultValue = "8983", description = "Solr Listen Port.  Default is 8983.")
+			"--listen-port" }, arity = "1", defaultValue = "8983", description = "Solr Listen Port.  Default is 8983 or what is defined in the config.")
 	private static int listenPort;
 
-	@Option(names = { "-sp", "--sp",
+	@Option(names = { "-sp", "--141sp",
 			"--stop-port" }, arity = "1", description = "Solr Stop Port.  Default is listen port minus 1000.")
 	private static int stopPort = Integer.MIN_VALUE;
 
