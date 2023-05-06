@@ -9,7 +9,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "mv", separator = " ", header = "Move/Rename a file within ZK", description = "Move file in ZK", footer = "\\nBoth source and desintation paths must be prefixed by 'zk:' for this command.")
+@Command(name = "mv", separator = " ", header = "Move/Rename a file within ZK", description = "Move file in ZK", footer = "\nBoth source and desintation paths will be treated as if they have the 'zk:' prefix.  You can explicitly add that prefix if you wish.")
 public class ZkMvCommand implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

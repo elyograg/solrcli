@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 
 @Command(name = "zk", header = "SolrCloud ZK Tool", description = "A tool for manipulating ZooKeeper for Solr", synopsisSubcommandLabel = "COMMAND", subcommands = {
-		ZkCpCommand.class, ZkRmCommand.class, ZkUpConfigCommand.class, ZkDownConfigCommand.class })
+		ZkCpCommand.class, ZkRmCommand.class, ZkMvCommand.class, ZkUpConfigCommand.class, ZkDownConfigCommand.class })
 public class ZkCommand {
 	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
