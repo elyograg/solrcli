@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "start")
+@Command(name = "start", separator = " ", header = "Start Solr", description = "Start Solr")
 public class StartCommand implements Runnable {
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -21,38 +21,38 @@ public class StartCommand implements Runnable {
 
 	@Option(names = { "-c",
 			"--cloud" }, arity = "0", description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.")
-	boolean cloud;
+	private static boolean cloud;
 
 	@Option(names = { "-f",
-			"--force" }, arity = "0", description = "Force Starting Solr as root and accepting port numbers below 1024.  Not recommended.")
-	boolean forceRoot;
+			"--force" }, arity = "0", description = "Force accepting port numbers below 1024, and starting Solr if it is run as root.  Not recommended.")
+	private static boolean forceRoot;
 
 	@Option(names = { "-m", "--mem", "--memory",
 			"--heap" }, arity = "1", defaultValue = "512m", description = "Solr Heap Size (values like 4g).")
-	String heap;
+	private static String heapSize;
 
-	@Option(names = { "-gc", "--gc" }, arity = "1", defaultValue = "g1", description = "Garbage collector: g1 or zfc")
-	GcType gc;
+	@Option(names = { "-gc", "--gc" }, arity = "1", defaultValue = "g1", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default g1")
+	private static GcType gcName;
 
 	@Option(names = { "-p",
 			"--listen-port" }, arity = "1", defaultValue = "8983", description = "Solr Listen Port.  Default is 8983.")
-	int listenPort;
+	private static int listenPort;
 
 	@Option(names = { "-sp", "--sp",
-			"--stop-port" }, arity = "1", description = "Solr Stop Port.  Default is listen port minus 1000")
-	int stopPort = Integer.MIN_VALUE;
+			"--stop-port" }, arity = "1", description = "Solr Stop Port.  Default is listen port minus 1000.")
+	private static int stopPort = Integer.MIN_VALUE;
 
 	@Option(names = { "-zp", "--zp", "--zk-port",
 			"--zookeeper-port" }, arity = "1", description = "Embedded ZooKeeper Port.  Default is listen port plus 1000.  Not used if not in cloud mode or -z option specified.")
-	int zkPort = Integer.MIN_VALUE;
+	private static int zkPort = Integer.MIN_VALUE;
 
 	@Option(names = { "-z", "--zkhost",
 			"--zkHost" }, arity = "1", description = "ZK connection string.  See ZK docs for how to specify multiple hosts and a chroot.  Using this option forces cloud mode.")
-	String zkHost;
+	private static String zkHost;
 
 	@Option(names = {
-			"-D" }, arity = "1", description = "System Property.  Can be specified multiple times.  Correct syntax is -Dprop=\"properties value\" with quotes required for spaces or other special characters.")
-	List<String> properties;
+			"-D" }, arity = "1", paramLabel = "prop=\"prop value\"", description = "System Property.  Can be specified multiple times.  Also works without a space, just like the -D option for Java.  Quotes are required if the value contains spaces or other special characters.")
+	private static List<String> properties;
 
 	@Override
 	public void run() {
@@ -62,8 +62,8 @@ public class StartCommand implements Runnable {
 			cloud = true;
 		}
 
-		log.info("Heap {}", heap);
-		log.info("GC {}", gc);
+		log.info("Heap {}", heapSize);
+		log.info("GC {}", gcName);
 		log.info("Listen Port {}", listenPort);
 		if (stopPort == Integer.MIN_VALUE) {
 			stopPort = listenPort - 1000;
@@ -94,15 +94,15 @@ public class StartCommand implements Runnable {
 		if (stopPort < startPort || stopPort > 65535 || listenPort < startPort || listenPort > 65535
 				|| (zkPort != 0 && (zkPort < startPort || zkPort > 65535))) {
 			log.error("One of the ports is outside the valid range of 1024 to 65535");
-			MainCommand.exit(1);
+			MainCommand.exitProgram(1);
 		}
 
-		Properties props = new Properties();
+		final Properties props = new Properties();
 		if (properties != null) {
-			for (String p : properties) {
-				String[] split = p.split("=");
-				String prop = split[0];
-				String value = split[1];
+			for (final String p : properties) {
+				final String[] split = p.split("=");
+				final String prop = split[0];
+				final String value = split[1];
 				props.put(prop, value);
 				log.info("sysProp {}", p);
 			}

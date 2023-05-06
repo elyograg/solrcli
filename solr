@@ -19,7 +19,7 @@ REQUIRED_PROGS=(which realpath lsof gzip mktemp)
 MINIMUM_JAVA_MAJOR_VERSION="11"
 JAR_FILE="solrcli.jar"
 LOG_FILE="solrcli.log"
-CONTROL_HEAP="128m"
+LOCAL_HEAP="128m"
 
 function cleanup_and_exit() {
   local EXITCODE var
@@ -163,16 +163,21 @@ assign_temp_file "TMPFILE1"
 
 # Run the application with options that do nothing and exit.
 # This is just to make sure that Java is new enough.
-"${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info --exit > "${TMPFILE1}" 2>&1
+"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --exit > "${TMPFILE1}" 2>&1
 RET="$?"
 UNSUPPORTED="$(grep -c "UnsupportedClassVersionError" "${TMPFILE1}")"
 
-if [ "${RET}" -ne 0 ] && [ "${UNSUPPORTED}" -gt 0 ]; then
-  die "Java not new enough.  Minimum major version is ${MINIMUM_JAVA_MAJOR_VERSION}."
+if [ "${RET}" -ne 0 ]; then
+  if [ "${UNSUPPORTED}" -gt 0 ]; then
+    log_err "Java not new enough.  Minimum major version is ${MINIMUM_JAVA_MAJOR_VERSION}."
+  fi
+  cp -f "${TMPFILE1}" /tmp/last_solr_error
+  log_err "Error encountered running the control program ${JAR_FILE}"
+  die "Output was placed in /tmp/last_solr_error"
 fi
 
 # Run the application with an option to print the log directory and immediately exit.
-LOG_DIR="$("${JAVA_BIN}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> /dev/null)"
+LOG_DIR="$("${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> /dev/null)"
 RET="$?"
 if [ "${RET}" -ne 0 ]; then
   die "Getting the log directory failed."
@@ -182,7 +187,7 @@ FULL_LOG_FILE="${LOG_DIR}/${LOG_FILE}"
 rotate_logs
 
 # Run the application for real with all the options given to this script.
-"${JAVA_BIN}" "-Xms${CONTROL_HEAP}" "-Xmx${CONTROL_HEAP}" -jar "${JAR_FILE}" "$@" > "${FULL_LOG_FILE}" 2>&1
+"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@" > "${FULL_LOG_FILE}" 2>&1
 
 echo "JAVA_HOME=\"${JAVA_HOME}\""
 echo "JAVA_BIN=\"${JAVA_BIN}\""

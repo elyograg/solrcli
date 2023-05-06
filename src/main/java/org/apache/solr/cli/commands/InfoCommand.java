@@ -1,7 +1,6 @@
 package org.apache.solr.cli.commands;
 
 import java.lang.invoke.MethodHandles;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.solr.cli.MainCommand;
 import org.slf4j.Logger;
@@ -9,18 +8,9 @@ import org.slf4j.LoggerFactory;
 
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
-
-@Command(name = "info")
+@Command(name = "info", separator = " ",header = "Information tool", description = "Obtain information about the Solr install and exit quickly.")
 public class InfoCommand implements Runnable {
-	@SuppressWarnings("unused")
 	private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
-	private static final AtomicBoolean verbose = new AtomicBoolean(false);
-
-//	@Option(names = { "-h", "--help" }, description = "Print usage")
-//	private static boolean help;
-
-	@Option(names = { "-d", "--debug", "-v", "--verbose" }, description = "Debug/Verbose mode")
-	private static boolean verboseFlag;
 
 	@Option(names = { "--exit" }, description = "Immediately exit.  Mostly used to ensure the application can run.")
 	private static boolean exitFlag;
@@ -30,19 +20,17 @@ public class InfoCommand implements Runnable {
 
 	@Override
 	public void run() {
-		verbose.set(verboseFlag);
 
 		if (exitFlag) {
 			log.warn("Exiting program as requested");
-			MainCommand.exit();
+			MainCommand.exitProgram();
 		}
 
 		if (getLogDir) {
-			// TODO: Once the init() function is done, actually return
-			// configured log dir.
 			log.info("Obtaining log directory");
+			// TODO: Actually print configured log directory.
 			System.out.println("/tmp/cli_log");
-			MainCommand.exit();
+			MainCommand.exitProgram();
 		}
 
 		log.info("Starting info command");

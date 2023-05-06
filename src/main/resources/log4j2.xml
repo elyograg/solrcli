@@ -15,21 +15,28 @@
   limitations under the License.
   -->
 
+<!--
+  The default logging configuration here sends to STDERR, not STDOUT.
+  This is so that the logging does not interfere with using STDOUT
+  to pass messages back to the caller.
+  -->
+
 <?xml-model href=""?>
 <Configuration>
-  <Appenders>
-    <Console name="STDERR" target="SYSTEM_ERR">
-      <PatternLayout>
-        <Pattern>
-          %maxLen{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p (%t) %c{1.} %m%notEmpty{ =>%ex{short}}}{10240}%n
-        </Pattern>
-      </PatternLayout>
-    </Console>
-  </Appenders>
-  <Loggers>
-    <AsyncLogger name="some.package.name" level="warn"/>
-    <AsyncRoot level="debug">
-      <AppenderRef ref="STDERR"/>
-    </AsyncRoot>
-  </Loggers>
+	<Appenders>
+		<Console name="STDERR" target="SYSTEM_ERR">
+			<PatternLayout>
+				<Pattern>
+					%maxLen{%d{yyyy-MM-dd HH:mm:ss.SSS} %-5p (%t) %c{1.} %m%notEmpty{
+					=>%ex{short}}}{10240}%n
+				</Pattern>
+			</PatternLayout>
+		</Console>
+	</Appenders>
+	<Loggers>
+		<AsyncLogger name="org.apache.logging.log4j" level="error" />
+		<AsyncRoot level="debug">
+			<AppenderRef ref="STDERR" />
+		</AsyncRoot>
+	</Loggers>
 </Configuration>
