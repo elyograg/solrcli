@@ -21,7 +21,7 @@ import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 
 @Command(name = "solr", separator = " ", scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", version = "9.3.0", synopsisSubcommandLabel = "COMMAND", subcommands = {
-    InfoCommand.class, ZkCommand.class, StartCommand.class, StopCommand.class })
+    StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class })
 public final class MainCommand {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static CommandLine cmdLine;

@@ -15,7 +15,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-REQUIRED_PROGS=(which realpath lsof gzip mktemp)
+REQUIRED_PROGS=(which realpath lsof gzip mktemp sudo su)
 MINIMUM_JAVA_MAJOR_VERSION="11"
 JAR_FILE="build/libs/solrcli-all-0.0.1-SNAPSHOT.jar"
 LOG_FILE="solrcli.log"
