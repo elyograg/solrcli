@@ -3,7 +3,6 @@ package org.apache.solr.cli.commands;
 import java.lang.invoke.MethodHandles;
 
 import org.apache.solr.cli.MainCommand;
-import org.apache.solr.cli.commands.StopCommand.StopPorts;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +17,7 @@ public class InfoCommand implements Runnable {
 	@ArgGroup(multiplicity = "1")
 	private static InfoArgs infoArgs;
 
-	static final class InfoArgs {
+	private static final class InfoArgs {
 		@Option(names = { "-x",
 				"--exit" }, description = "Immediately exit.  Mostly used to ensure the application can run.")
 		private static boolean exitFlag;
@@ -45,4 +44,3 @@ public class InfoCommand implements Runnable {
 		log.info("Starting info command");
 	}
 }
- 

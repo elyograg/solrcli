@@ -17,7 +17,7 @@ public final class StopCommand implements Runnable {
 	@ArgGroup(multiplicity = "1")
 	private static StopPorts stopPorts;
 
-	static final class StopPorts {
+	private static final class StopPorts {
 		@Option(names = { "-all", }, arity = "0", description = "Find and stop all running Solr servers on this host.")
 		boolean stopAll;
 
