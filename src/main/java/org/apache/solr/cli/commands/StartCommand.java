@@ -39,7 +39,7 @@ public class StartCommand implements Runnable {
       "--listen-port" }, arity = "1", defaultValue = "8983", description = "Solr Listen Port.  Default is 8983 or what is defined in the config.")
   private static int listenPort;
 
-  @Option(names = { "-sp", "--141sp",
+  @Option(names = { "-sp", "--sp",
       "--stop-port" }, arity = "1", description = "Solr Stop Port.  Default is listen port minus 1000.")
   private static int stopPort = Integer.MIN_VALUE;
 
