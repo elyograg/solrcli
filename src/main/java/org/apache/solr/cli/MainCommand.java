@@ -1,5 +1,6 @@
 package org.apache.solr.cli;
 
+import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.security.InvalidParameterException;
 
@@ -20,7 +21,7 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 
-@Command(name = "solr", separator = " ", scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", version = "9.3.0", synopsisSubcommandLabel = "COMMAND", subcommands = {
+@Command(name = "solr", separator = " ", version = MainConfig.SOLR_VERSION, scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", synopsisSubcommandLabel = "COMMAND", subcommands = {
     StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class })
 public final class MainCommand {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
@@ -38,8 +39,8 @@ public final class MainCommand {
       "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log all debug messages.")
   boolean verbose;
 
-  public static final void main(final String[] args) {
-    if (!MainConfig.validateConfig()) {
+  public static final void main(final String[] args) throws FileNotFoundException {
+    if (!MainConfig.validateConfig(configFile)) {
       final String msg = "Something is amiss in the sysProps or config.";
       log.error("", new InvalidParameterException(msg));
     }

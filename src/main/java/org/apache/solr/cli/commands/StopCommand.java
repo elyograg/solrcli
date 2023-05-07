@@ -33,7 +33,7 @@ public final class StopCommand implements Runnable {
 
   @Override
   public void run() {
-    stopKey = MainConfig.getStopKey();
+    stopKey = MainConfig.getProperty(MainConfig.SYSPROP_STOPKEY);
     log.info("Beginning start command.");
 
     // TODO: implement!
