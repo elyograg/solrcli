@@ -8,7 +8,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "upconfig", header = "Upload collection config to ZK", description = "Upload collection config")
+@Command(name = "upconfig", description = "Upload collection config to ZK")
 public class ZkUpConfigCommand implements Runnable {
   @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

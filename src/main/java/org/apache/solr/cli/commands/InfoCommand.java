@@ -1,6 +1,7 @@
 package org.apache.solr.cli.commands;
 
 import java.lang.invoke.MethodHandles;
+import java.util.TreeSet;
 
 import org.apache.solr.cli.StaticStuff;
 import org.slf4j.Logger;
@@ -10,7 +11,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "info", header = "Information tool", description = "Obtain information about the Solr install and exit quickly.")
+@Command(name = "info", description = "Obtain information about the Solr install and exit.")
 public class InfoCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
@@ -25,10 +26,25 @@ public class InfoCommand implements Runnable {
     @Option(names = { "-ld",
         "--logdir" }, description = "Print logging directory to stdout and exit.")
     private static boolean getLogDir;
+
+    @Option(names = { "-props", "--props" }, description = "Print all system Properties and exit.")
+    private static boolean printSysProps;
   }
 
   @Override
   public void run() {
+    log.info("Starting info command");
+
+    if (InfoArgs.printSysProps) {
+      final TreeSet<Object> sortedProps = new TreeSet<>();
+      sortedProps.addAll(System.getProperties().keySet());
+      log.info("All system properties:");
+      for (final Object o : sortedProps) {
+        final String prop = (String) o;
+        log.info("{}: {{}}", prop, System.getProperty(prop));
+      }
+      StaticStuff.exitProgram();
+    }
 
     if (InfoArgs.exitFlag) {
       log.warn("Exiting program as requested");
@@ -41,6 +57,5 @@ public class InfoCommand implements Runnable {
       StaticStuff.exitProgram();
     }
 
-    log.info("Starting info command");
   }
 }

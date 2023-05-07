@@ -10,7 +10,7 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "stop", header = "Stop Solr", description = "Stops one or more Solr instances.")
+@Command(name = "stop", description = "Stops one or more Solr instances.")
 public final class StopCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

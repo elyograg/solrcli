@@ -44,7 +44,7 @@ public final class MainCommand {
 
   /** Debug option. */
   @Option(names = { "-v", "--verbose", "--d",
-      "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log all debug messages.")
+      "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log any available debug messages.  Some commands may not have debug logging.")
   boolean verbose;
 
   /**

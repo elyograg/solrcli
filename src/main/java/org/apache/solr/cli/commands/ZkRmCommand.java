@@ -10,7 +10,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "rm", header = "Delete a file ZooKeeper", description = "Delete file", footer = "\nThe deleteFile argument will be treated as if it has the 'zk:' prefix.  You can explicitly add that prefix if you wish."
+@Command(name = "rm", description = "Delete file", footer = "\nThe deleteFile argument will be treated as if it has the 'zk:' prefix.  You can explicitly add that prefix if you wish."
     + StaticStuff.USAGE_OPTION_SEPARATOR_TEXT)
 public class ZkRmCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

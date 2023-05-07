@@ -11,7 +11,7 @@ import org.slf4j.LoggerFactory;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "start", header = "Start Solr", sortOptions = false, description = "Starts an instance of Solr")
+@Command(name = "start", sortOptions = false, description = "Starts an instance of Solr")
 public class StartCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 

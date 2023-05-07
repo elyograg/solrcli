@@ -15,11 +15,34 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+#-- set SCRIPT_DEBUG to get debug messages.
 REQUIRED_PROGS=(which realpath lsof gzip mktemp sudo su)
 MINIMUM_JAVA_MAJOR_VERSION="11"
 JAR_FILE="build/libs/solrcli-all-0.0.1-SNAPSHOT.jar"
 LOG_FILE="solrcli.log"
 LOCAL_HEAP="128m"
+
+function get_timestamp() {
+  date "+%4Y-%m-%d_%H:%M:%S.%3N"
+}
+
+function log_debug() {
+  if [ -n "${SCRIPT_DEBUG}" ]; then
+    echo -e "$(get_timestamp) DEBUG $*"
+  fi
+}
+
+function log_info() {
+  echo -e "$(get_timestamp) INFO  $*"
+}
+
+function log_warn() {
+  echo -e "$(get_timestamp) WARN  $*"
+}
+
+function log_err() {
+  echo -e "$(get_timestamp) ERROR $*" >> /dev/stderr
+}
 
 function cleanup_and_exit() {
   local EXITCODE var
@@ -48,26 +71,6 @@ function assign_temp_file() {
   TMPVARS+=("${VARNAME}")
   # debugging
   #log_warn "${VARNAME}=\"${TMPFILENAME}\""
-}
-
-function get_timestamp() {
-  date "+%4Y-%m-%d_%H:%M:%S"
-}
-
-function log_DEBUG() {
-  echo -e "$(get_timestamp) DEBUG $*"
-}
-
-function log_info() {
-  echo -e "$(get_timestamp) INFO  $*"
-}
-
-function log_warn() {
-  echo -e "$(get_timestamp) WARN  $*"
-}
-
-function log_err() {
-  echo -e "$(get_timestamp) ERROR $*" >> /dev/stderr
 }
 
 function print_java_paths_stderr() {
@@ -118,8 +121,8 @@ function find_java_home() {
     die "Running ${JAVA_BIN} with basic options failed."
   fi
 
-  export JAVA_BIN
-  export JAVA_HOME
+  #export JAVA_BIN
+  #export JAVA_HOME
 }
 
 function check_required_progs() {
@@ -157,36 +160,33 @@ function rotate_logs() {
 # Begin execution
 #======================
 
+log_debug "Starting."
 TMPVARS=()
 SCRIPT_DIR="$(cd "$(dirname "$0")" || die "Error on cd to define SCRIPT_DIR" ; pwd -P)"
 cd "${SCRIPT_DIR}" || die "Can't cd to script directory ${SCRIPT_DIR}"
 
+log_debug "Locating JAVE_HOME."
 find_java_home
+log_debug "Checking required programs."
 check_required_progs
+log_debug "Getting a temp file path."
 assign_temp_file "TMPFILE1"
 
-# Run the application with options that do nothing and exit.
-# This is just to make sure that Java can run the program.
-"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --exit > "${TMPFILE1}" 2>&1
+# Run the application with an option to print the log directory and immediately exit.
+log_debug "Getting the log directory"
+LOG_DIR="$("${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> "${TMPFILE1}")"
 RET="$?"
 UNSUPPORTED="$(grep -c "UnsupportedClassVersionError" "${TMPFILE1}")"
 if [ "${RET}" -ne 0 ]; then
   {
-    echo "--- check command output:"
+    echo "--- command output:"
     cat "${TMPFILE1}" >> /dev/stderr
     echo "---"
   } >> /dev/stderr
   if [ "${UNSUPPORTED}" -gt 0 ]; then
     log_err "Java not new enough.  Minimum major java version is ${MINIMUM_JAVA_MAJOR_VERSION}."
   fi
-  die "Aborting due to error checking control program."
-fi
-
-# Run the application with an option to print the log directory and immediately exit.
-LOG_DIR="$("${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> /dev/null)"
-RET="$?"
-if [ "${RET}" -ne 0 ]; then
-  die "Getting the log directory failed."
+  die "Aborting due to error getting logfile."
 fi
 FULL_LOG_FILE="${LOG_DIR}/${LOG_FILE}"
 
@@ -196,7 +196,8 @@ rotate_logs
 # I was sending all output to a logfile, but that means the usage info
 # does not get displayed.  TODO: Need to plan out the log4j2 config.
 #"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@" > "${FULL_LOG_FILE}" 2>&1
-"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@"
+log_debug "Passing control to java."
+"${JAVA_BIN}" -Djava.bin="${JAVA_BIN}" -Djava.home="${JAVA_HOME}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@"
 
 #echo "JAVA_HOME=\"${JAVA_HOME}\""
 #echo "JAVA_BIN=\"${JAVA_BIN}\""

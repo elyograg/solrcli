@@ -10,7 +10,7 @@ import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.Parameters;
 
-@Command(name = "cp", header = "Copy file to/from ZooKeeper", description = "Copy file", footer = "\nOne of the source or destination files must be prefixed by 'zk:' for this command. You can explicitly include that prefix on either or both files."
+@Command(name = "cp", description = "Copy files to/from ZK", footer = "\nOne of the source or destination files must be prefixed by 'zk:' for this command. You can explicitly include that prefix on either or both files."
     + StaticStuff.USAGE_OPTION_SEPARATOR_TEXT)
 public class ZkCpCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());

@@ -8,6 +8,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,18 +38,20 @@ public final class StaticStuff {
   /** The Constant CONFIG_FILE_NAME. */
   private static final String CONFIG_FILE_NAME = "solr.yml";
 
+  private static AtomicBoolean debugFlag = new AtomicBoolean();
+
   // TODO: Remove "." from these path lists.
 
   /** The Constant WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS. */
   private static final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS = {
       System.getenv("SCRIPT_DIR") + SEP + CONFIG_FILE_NAME,
-      System.getenv("USERPROFILE") + SEP + "." + CONFIG_FILE_NAME,
+      System.getProperty("user.home") + SEP + "." + CONFIG_FILE_NAME,
       "C:\\Solr" + SEP + CONFIG_FILE_NAME, "." };
 
   /** The Constant DEFAULT_CONFIG_FILE_LOCATIONS. */
   private static final String[] DEFAULT_CONFIG_FILE_LOCATIONS = {
       System.getenv("SCRIPT_DIR") + SEP + CONFIG_FILE_NAME,
-      System.getenv("HOME") + SEP + "." + CONFIG_FILE_NAME,
+      System.getProperty("user.home") + SEP + "." + CONFIG_FILE_NAME,
       "usr/local/share" + SEP + CONFIG_FILE_NAME, "usr/share/solr" + SEP + CONFIG_FILE_NAME,
       "/etc/default" + SEP + CONFIG_FILE_NAME, "/var/solr" + SEP + CONFIG_FILE_NAME,
       "/opt/solr" + SEP + CONFIG_FILE_NAME, "." };
@@ -74,27 +77,28 @@ public final class StaticStuff {
   public static final String USAGE_OPTION_SEPARATOR_TEXT = "\nThis help shows an equal sign for separating an option and its value. A space also works, and for single-character options, no separator is required. Documentation will mostly use a space.";
 
   /** The Constant GC_ZGC_DEFAULT_OPTIONS. */
-  public static final String[] GC_ZGC_DEFAULT_OPTIONS = { "-XX:+UnlockExperimentalVMOptions",
-      "-XX:+UseZGC", "-XX:+ParallelRefProcEnabled", "-XX:+ExplicitGCInvokesConcurrent",
-      "-XX:+AlwaysPreTouch", "-XX:+UseNUMA" };
+  public static final String[] GC_ZGC_OPTIONS = { "-XX:+UnlockExperimentalVMOptions", "-XX:+UseZGC",
+      "-XX:+ParallelRefProcEnabled", "-XX:+ExplicitGCInvokesConcurrent", "-XX:+AlwaysPreTouch",
+      "-XX:+UseNUMA" };
 
   /** The Constant GC_G1_DEFAULT_OPTIONS. */
-  public static final String[] GC_G1_DEFAULT_OPTIONS = { "-XX:+UseG1GC",
-      "-XX:+ParallelRefProcEnabled", "-XX:MaxGCPauseMillis=100", "-XX:+ExplicitGCInvokesConcurrent",
-      "-XX:+UseStringDeduplication", "-XX:+AlwaysPreTouch", "-XX:+UseNUMA" };
+  public static final String[] GC_G1_OPTIONS = { "-XX:+UseG1GC", "-XX:+ParallelRefProcEnabled",
+      "-XX:MaxGCPauseMillis=100", "-XX:+ExplicitGCInvokesConcurrent", "-XX:+UseStringDeduplication",
+      "-XX:+AlwaysPreTouch", "-XX:+UseNUMA" };
 
   /**
    * Parse the cross-platform configuration file, place those settings in this
    * class, and validate the configuration as completely as possible.
    *
-   * @param configFileParam the config file param
+   * @param configFileParam the location of the configuration file. Use null to
+   *                        search the default locations.
    * @return whether or not the validation passed.
    * @throws FileNotFoundException if a readable configuration file was not found.
    */
   public static final boolean parseAndValidateConfig(final String configFileParam)
       throws FileNotFoundException {
-    // TODO: Start with false when this actually works.
-    boolean validated = true;
+    // TODO: Start with false when validation is working.
+    final boolean validated = true;
 
     if (configFileParam == null || configFileParam.equals("")) {
       configFilePath = findConfigFile();
@@ -113,10 +117,7 @@ public final class StaticStuff {
 
       // TODO: Validate that all required sysProps and/or environment variables are
       // correctly defined. If not, indicate what is missing or incorrect. Display
-      // requirements. Delete this meaningless test.
-      if (true) {
-        validated = true;
-      }
+      // requirements.
     }
     log.info("configFile {{}}", configFilePath);
     return validated;
@@ -155,19 +156,7 @@ public final class StaticStuff {
   }
 
   /**
-   * Get the whole configuration as a {@link Properties} object.
-   * 
-   * TODO: Decide if this is actually needed or if the
-   * {@link #getProperty(String)} method is enough. Leaning towards removal.
-   * 
-   * @return the whole configuration {@link Properties} object.
-   */
-  public static final Properties getConfigProperties() {
-    return configProperties;
-  }
-
-  /**
-   * Gets the property.
+   * Gets a configuration property.
    *
    * @param propertyParam the property param
    * @return the property
@@ -187,5 +176,13 @@ public final class StaticStuff {
       exitCode = code[0];
     }
     System.exit(exitCode);
+  }
+
+  public static boolean getDebugFlag() {
+    return debugFlag.get();
+  }
+
+  public static void setDebugFlag(final boolean debug) {
+    debugFlag.set(debug);
   }
 }
