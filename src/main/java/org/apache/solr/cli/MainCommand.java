@@ -2,6 +2,7 @@ package org.apache.solr.cli;
 
 import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
+import java.security.InvalidParameterException;
 
 import org.apache.solr.cli.commands.InfoCommand;
 import org.apache.solr.cli.commands.StartCommand;
@@ -20,41 +21,46 @@ import picocli.CommandLine.Model.CommandSpec;
 import picocli.CommandLine.Option;
 import picocli.CommandLine.ScopeType;
 
-@Command(name = "solr", separator = " ", version = MainConfig.SOLR_VERSION, scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", synopsisSubcommandLabel = "COMMAND", subcommands = {
-    StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class })
+/** The main command class. */
+@Command(name = "solr", sortOptions = false, version = StaticStuff.SOLR_VERSION, scope = ScopeType.INHERIT, description = "A script that controls Solr and related functionality.", synopsisSubcommandLabel = "COMMAND", subcommands = {
+    StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class }, footer = StaticStuff.OPTION_SEPARATOR_USAGE_TEXT)
 public final class MainCommand {
-  @SuppressWarnings("unused")
+
+  /** Logger object. */
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
+
+  /** A {@link CommandLine} object. */
   private static CommandLine cmdLine;
 
+  /** Help option. */
   @Option(names = { "-h",
       "--help" }, arity = "0", usageHelp = true, scope = ScopeType.INHERIT, description = "Display command usage.")
   boolean help;
 
+  /** Configuration file option. */
   @Option(names = { "-config",
-      "--config" }, arity = "1", scope = ScopeType.INHERIT, description = "The location of the cross-platform config file.")
-  private static String configFile;
+      "--config" }, arity = "1", scope = ScopeType.INHERIT, description = "The location of the cross-platform config file.  If not present, program will search predefined paths for the file.")
+  private static String configFile = null;
 
+  /** Debug option. */
   @Option(names = { "-v", "--verbose", "--d",
       "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log all debug messages.")
   boolean verbose;
 
+  /**
+   * The main method.
+   *
+   * @param args command-line arguments
+   * @throws FileNotFoundException the file not found exception
+   */
   public static final void main(final String[] args) throws FileNotFoundException {
-    //if (!MainConfig.validateConfig(configFile)) {
-    //  final String msg = "Something is amiss in the sysProps or config.";
-    //  log.error("", new InvalidParameterException(msg));
-    //}
+    if (!StaticStuff.parseAndValidateConfig(configFile)) {
+      final String msg = "Something is amiss in the sysProps or config.";
+      log.error("", new InvalidParameterException(msg));
+    }
     cmdLine = new CommandLine(new MainCommand());
     cmdLine.setHelpFactory(createCustomizedUsageHelp());
     cmdLine.execute(args);
-  }
-
-  public static final void exitProgram(final int... code) {
-    int exitCode = 0;
-    if (code == null || code.length > 0) {
-      exitCode = code[0];
-    }
-    System.exit(exitCode);
   }
 
   /**
@@ -63,7 +69,7 @@ public final class MainCommand {
    * left-aligned. Without this, it indents two-character options further than the
    * single-character options, which looks weird.
    *
-   * @return a class that can be used by {@link CommandLine}.
+   * @return a factory object for help formatting.
    */
   private static final IHelpFactory createCustomizedUsageHelp() {
     return new IHelpFactory() {

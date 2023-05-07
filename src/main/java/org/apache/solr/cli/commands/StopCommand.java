@@ -2,7 +2,7 @@ package org.apache.solr.cli.commands;
 
 import java.lang.invoke.MethodHandles;
 
-import org.apache.solr.cli.MainConfig;
+import org.apache.solr.cli.StaticStuff;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -10,9 +10,8 @@ import picocli.CommandLine.ArgGroup;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Option;
 
-@Command(name = "stop", separator = " ", header = "Stop Solr", description = "Stops one or more Solr instances.")
+@Command(name = "stop", header = "Stop Solr", description = "Stops one or more Solr instances.")
 public final class StopCommand implements Runnable {
-  { System.out.println("point"); }
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @ArgGroup(multiplicity = "1")
@@ -34,7 +33,7 @@ public final class StopCommand implements Runnable {
 
   @Override
   public void run() {
-    stopKey = MainConfig.getProperty(MainConfig.SYSPROP_STOPKEY);
+    stopKey = StaticStuff.getProperty(StaticStuff.SYSPROP_STOPKEY);
     log.info("Beginning start command.");
 
     // TODO: implement!
