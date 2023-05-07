@@ -2,7 +2,6 @@ package org.apache.solr.cli;
 
 import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
-import java.security.InvalidParameterException;
 
 import org.apache.solr.cli.commands.InfoCommand;
 import org.apache.solr.cli.commands.StartCommand;
@@ -24,6 +23,7 @@ import picocli.CommandLine.ScopeType;
 @Command(name = "solr", separator = " ", version = MainConfig.SOLR_VERSION, scope = ScopeType.INHERIT, header = "Solr Control Program", description = "A program that controls Solr and related functionality.", synopsisSubcommandLabel = "COMMAND", subcommands = {
     StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class })
 public final class MainCommand {
+  @SuppressWarnings("unused")
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
   private static CommandLine cmdLine;
 

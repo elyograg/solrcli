@@ -12,9 +12,11 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * A class that holds configuration info and constants.
+ * A class that holds configuration info and constants. Everything that is not
+ * actually needed by the rest of the program is intentionally set to private,
+ * beginning with the configuration file path.
  *
- * TODO: Decide whether {@link Properties} is the right way to store config
+ * TODO: Decide whether {@link Properties} is the right way to store configuration
  * data.
  */
 public final class MainConfig {
@@ -26,6 +28,7 @@ public final class MainConfig {
   private static final String SEP = FileSystems.getDefault().getSeparator();
   private static final String CONFIG_FILE_NAME = "solr.yml";
   private static final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS = {
+      System.getenv("SCRIPT_DIR") + SEP + CONFIG_FILE_NAME,
       System.getenv("USERPROFILE") + SEP + "." + CONFIG_FILE_NAME,
       "C:\\Solr" + SEP + CONFIG_FILE_NAME };
   private static final String[] POSIX_DEFAULT_CONFIG_FILE_LOCATIONS = {
@@ -35,7 +38,7 @@ public final class MainConfig {
       "/etc/default" + SEP + CONFIG_FILE_NAME, "/var/solr" + SEP + CONFIG_FILE_NAME,
       "/opt/solr" + SEP + CONFIG_FILE_NAME };
 
-  private static String configFile;
+  private static String configFileString;
 
   /**
    * Parse the cross-platform configuration file, place those settings in this
@@ -49,19 +52,19 @@ public final class MainConfig {
     boolean validated = false;
 
     if (configFileParam == null || configFileParam.equals("")) {
-      configFile = findConfigFile();
+      configFileString = findConfigFile();
     } else {
-      configFile = configFileParam;
-      if (!Files.isReadable(Paths.get(configFile))) {
-        log.error("Specified config file {} does not exist or is not readable.", configFile);
-        configFile = null;
+      configFileString = configFileParam;
+      if (!Files.isReadable(Paths.get(configFileString))) {
+        log.error("Specified config file {} does not exist or is not readable.", configFileString);
+        configFileString = null;
       }
 
-      if (configFile == null || configFile.equals("")) {
+      if (configFileString == null || configFileString.equals("")) {
         throw new FileNotFoundException("Unable to find config file!");
       }
 
-      parseConfig(configFile);
+      parseConfig(configFileString);
 
       // TODO: Validate that all required sysProps and/or environment variables are
       // correctly defined. If not, indicate what is missing or incorrect. Display
@@ -83,9 +86,9 @@ public final class MainConfig {
   }
 
   /**
-   * Look for a config file in predetermined locations.
+   * Look for a configuration file in predetermined locations.
    *
-   * @return the path to the chosen config file.
+   * @return the path to the chosen configuration file.
    */
   private static String findConfigFile() {
     String configFilePath = null;

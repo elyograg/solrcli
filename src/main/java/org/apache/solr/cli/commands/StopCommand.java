@@ -12,6 +12,7 @@ import picocli.CommandLine.Option;
 
 @Command(name = "stop", separator = " ", header = "Stop Solr", description = "Stops one or more Solr instances.")
 public final class StopCommand implements Runnable {
+  { System.out.println("point"); }
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @ArgGroup(multiplicity = "1")

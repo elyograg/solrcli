@@ -51,23 +51,23 @@ function assign_temp_file() {
 }
 
 function get_timestamp() {
-  date "+%4Y-%m-%dT%H:%M:%S"
+  date "+%4Y-%m-%d_%H:%M:%S"
 }
 
 function log_DEBUG() {
-  echo -e "DEBUG $(get_timestamp): $*"
+  echo -e "$(get_timestamp) DEBUG $*"
 }
 
 function log_info() {
-  echo -e "INFO  $(get_timestamp): $*"
+  echo -e "$(get_timestamp) INFO  $*"
 }
 
 function log_warn() {
-  echo -e "WARN  $(get_timestamp): $*"
+  echo -e "$(get_timestamp) WARN  $*"
 }
 
 function log_err() {
-  echo -e "ERROR $(get_timestamp): $*" >> /dev/stderr
+  echo -e "$(get_timestamp) ERROR $*" >> /dev/stderr
 }
 
 function print_java_paths_stderr() {
@@ -173,7 +173,7 @@ UNSUPPORTED="$(grep -c "UnsupportedClassVersionError" "${TMPFILE1}")"
 if [ "${RET}" -ne 0 ]; then
   {
     echo "--- check command output:"
-    cat "${TMPFILE1}"
+    cat "${TMPFILE1}" >> /dev/stderr
     echo "---"
   } >> /dev/stderr
   if [ "${UNSUPPORTED}" -gt 0 ]; then

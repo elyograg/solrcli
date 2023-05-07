@@ -11,7 +11,7 @@ class MainCommandTests {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   @Test
-  void contextLoads() {
+  private void contextLoads() {
     log.info("Testing!");
   }
 }

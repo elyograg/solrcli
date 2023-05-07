@@ -36,7 +36,6 @@ public class InfoCommand implements Runnable {
     }
 
     if (InfoArgs.getLogDir) {
-      log.info("Obtaining log directory");
       // TODO: Actually print configured log directory.
       System.out.println("/tmp/cli_log");
       MainCommand.exitProgram();
