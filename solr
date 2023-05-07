@@ -53,7 +53,7 @@ function cleanup_and_exit() {
     EXITCODE="0"
   fi
 
-  for var in "${TMPVARS[@]}"
+  for var in "${TMP_VARS[@]}"
   do
     rm -f "${!var}"
   done
@@ -68,7 +68,7 @@ function assign_temp_file() {
   TMPFILENAME="$(mktemp)"
   rm -f "${TMPFILENAME}"
   eval "${VARNAME}"="$TMPFILENAME"
-  TMPVARS+=("${VARNAME}")
+  TMP_VARS+=("${VARNAME}")
   # debugging
   #log_warn "${VARNAME}=\"${TMPFILENAME}\""
 }
@@ -120,9 +120,6 @@ function find_java_home() {
   if [ "$RET" -ne 0 ]; then
     die "Running ${JAVA_BIN} with basic options failed."
   fi
-
-  #export JAVA_BIN
-  #export JAVA_HOME
 }
 
 function check_required_progs() {
@@ -161,7 +158,8 @@ function rotate_logs() {
 #======================
 
 log_debug "Starting."
-TMPVARS=()
+TMP_VARS=()
+LOCAL_PROP_OPTIONS=()
 SCRIPT_DIR="$(cd "$(dirname "$0")" || die "Error on cd to define SCRIPT_DIR" ; pwd -P)"
 cd "${SCRIPT_DIR}" || die "Can't cd to script directory ${SCRIPT_DIR}"
 
@@ -192,13 +190,14 @@ FULL_LOG_FILE="${LOG_DIR}/${LOG_FILE}"
 
 rotate_logs
 
+LOCAL_PROP_OPTIONS+=("-Djava.bin=${JAVA_BIN}")
+LOCAL_PROP_OPTIONS+=("-Djava.home=${JAVA_HOME}")
+LOCAL_PROP_OPTIONS+=("-Dscript.dir=${SCRIPT_DIR}")
+
 # Run the application for real with all the options given to this script.
-# I was sending all output to a logfile, but that means the usage info
-# does not get displayed.  TODO: Need to plan out the log4j2 config.
+# TODO: Plan out the log4j2 config so things get logged to a file as well.
 #"${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@" > "${FULL_LOG_FILE}" 2>&1
 log_debug "Passing control to java."
-"${JAVA_BIN}" -Djava.bin="${JAVA_BIN}" -Djava.home="${JAVA_HOME}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@"
+"${JAVA_BIN}" "${LOCAL_PROP_OPTIONS[@]}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" "$@"
 
-#echo "JAVA_HOME=\"${JAVA_HOME}\""
-#echo "JAVA_BIN=\"${JAVA_BIN}\""
 cleanup_and_exit

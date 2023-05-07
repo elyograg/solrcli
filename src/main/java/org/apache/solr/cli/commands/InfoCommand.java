@@ -19,15 +19,11 @@ public class InfoCommand implements Runnable {
   private static InfoArgs infoArgs;
 
   private static final class InfoArgs {
-    @Option(names = { "-x",
-        "--exit" }, description = "Immediately exit.  Mostly used to ensure the application can run.")
-    private static boolean exitFlag;
-
-    @Option(names = { "-ld",
-        "--logdir" }, description = "Print logging directory to stdout and exit.")
+    @Option(names = { "-ld", "--logdir" }, description = "Print logging directory and exit.")
     private static boolean getLogDir;
 
-    @Option(names = { "-props", "--props" }, description = "Print all system Properties and exit.")
+    @Option(names = { "-props",
+        "--props" }, description = "Print all Java System Properties and exit.")
     private static boolean printSysProps;
   }
 
@@ -46,16 +42,10 @@ public class InfoCommand implements Runnable {
       StaticStuff.exitProgram();
     }
 
-    if (InfoArgs.exitFlag) {
-      log.warn("Exiting program as requested");
-      StaticStuff.exitProgram();
-    }
-
     if (InfoArgs.getLogDir) {
       // TODO: Actually print configured log directory, not this placeholder.
       System.out.println("/tmp/cli_log");
       StaticStuff.exitProgram();
     }
-
   }
 }
