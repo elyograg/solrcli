@@ -40,10 +40,10 @@ public final class MainCommand {
   boolean verbose;
 
   public static final void main(final String[] args) throws FileNotFoundException {
-    if (!MainConfig.validateConfig(configFile)) {
-      final String msg = "Something is amiss in the sysProps or config.";
-      log.error("", new InvalidParameterException(msg));
-    }
+    //if (!MainConfig.validateConfig(configFile)) {
+    //  final String msg = "Something is amiss in the sysProps or config.";
+    //  log.error("", new InvalidParameterException(msg));
+    //}
     cmdLine = new CommandLine(new MainCommand());
     cmdLine.setHelpFactory(createCustomizedUsageHelp());
     cmdLine.execute(args);
