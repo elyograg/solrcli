@@ -12,12 +12,13 @@ import picocli.CommandLine.Option;
 public class ZkDownConfigCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
-  @Option(names = { "-z", "--zkhost" }, description = "ZK connection string", required = true)
-  String zkHost;
-  @Option(names = { "-d", "--directory" }, description = "Local directory to copy config to")
+  @Option(names = { "-d", "--dir",
+      "--directory" }, required = true, description = "Local directory to copy config to")
   String localDir;
-  @Option(names = { "-n", "--name" }, description = "The name of the config in ZK")
+  @Option(names = { "-n", "--name" }, required = true, description = "The name of the config in ZK")
   String configName;
+  @Option(names = { "-z", "--zkhost" }, required = true, description = "ZK connection string")
+  String zkHost;
 
   @Override
   public void run() {

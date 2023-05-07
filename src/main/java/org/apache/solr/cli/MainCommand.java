@@ -23,7 +23,7 @@ import picocli.CommandLine.ScopeType;
 
 /** The main command class. */
 @Command(name = "solr", sortOptions = false, version = StaticStuff.SOLR_VERSION, scope = ScopeType.INHERIT, description = "A script that controls Solr and related functionality.", synopsisSubcommandLabel = "COMMAND", subcommands = {
-    StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class }, footer = StaticStuff.OPTION_SEPARATOR_USAGE_TEXT)
+    StartCommand.class, StopCommand.class, ZkCommand.class, InfoCommand.class }, footer = StaticStuff.USAGE_OPTION_SEPARATOR_TEXT)
 public final class MainCommand {
 
   /** Logger object. */

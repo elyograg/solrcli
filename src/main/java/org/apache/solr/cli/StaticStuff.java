@@ -71,7 +71,7 @@ public final class StaticStuff {
   public static final String SYSPROP_STOPKEY = "stopKey";
 
   /** The Constant SYSPROP_STOPKEY. */
-  public static final String OPTION_SEPARATOR_USAGE_TEXT = "\nThis help shows an equal sign for separating an option and its value.  A space and no separator also work.";
+  public static final String USAGE_OPTION_SEPARATOR_TEXT = "\nThis help shows an equal sign for separating an option and its value. A space also works, and for single-character options, no separator is required. Documentation will mostly use a space.";
 
   /** The Constant GC_ZGC_DEFAULT_OPTIONS. */
   public static final String[] GC_ZGC_DEFAULT_OPTIONS = { "-XX:+UnlockExperimentalVMOptions",
