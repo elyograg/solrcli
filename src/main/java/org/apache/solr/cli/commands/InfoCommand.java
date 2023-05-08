@@ -19,14 +19,16 @@ public class InfoCommand implements Runnable {
   private static InfoArgs infoArgs;
 
   private static final class InfoArgs {
-    @Option(names = { "-ld", "--logdir" }, description = "Print logging directory and exit.    Default '${DEFAULT-VALUE}'")
+    @Option(names = { "-ld",
+        "--logdir" }, description = "Print logging directory and exit.    Default '${DEFAULT-VALUE}'")
     private static boolean getLogDir;
 
     @Option(names = { "-props",
         "--props" }, description = "Print all Java System Properties and exit.  Default '${DEFAULT-VALUE}'")
     private static boolean printSysProps;
 
-    @Option(names = { "-env", "--env" }, description = "Print all environment variables and exit.  Default '${DEFAULT-VALUE}'")
+    @Option(names = { "-env",
+        "--env" }, description = "Print all environment variables and exit.  Default '${DEFAULT-VALUE}'")
     private static boolean printEnv;
   }
 

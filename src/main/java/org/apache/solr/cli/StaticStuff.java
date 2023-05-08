@@ -11,6 +11,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
@@ -133,7 +134,8 @@ public final class StaticStuff {
   }
 
   /**
-   * Look for a configuration file in predetermined locations.
+   * Look for a configuration file in predetermined locations. TODO: Make the
+   * predetermined locations configurable rather than being semi-hard-coded here.
    *
    * @return the path to the chosen configuration file.
    */
@@ -148,16 +150,14 @@ public final class StaticStuff {
         String.format("%s%s%s", System.getProperty("script.dir"), SEP, CONFIG_FILE_NAME),
         String.format("%s%s.%s", System.getProperty("user.home"), SEP, CONFIG_FILE_NAME) };
 
-    // TODO: Remove the current directory from these location arrays.
-
     final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
-        String.format("%s%s%s", "C:\\Solr", SEP, CONFIG_FILE_NAME), "." };
+        String.format("%s%s%s", "C:\\Solr", SEP, CONFIG_FILE_NAME) };
     final String[] DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
         String.format("%s%s%s", "/etc/default", SEP, CONFIG_FILE_NAME),
         String.format("%s%s%s", "/usr/local/share", SEP, CONFIG_FILE_NAME),
         String.format("%s%s%s", "/usr/share/solr", SEP, CONFIG_FILE_NAME),
         String.format("%s%s%s", "/var/solr", SEP, CONFIG_FILE_NAME),
-        String.format("%s%s%s", "/opt/solr", SEP, CONFIG_FILE_NAME), "." };
+        String.format("%s%s%s", "/opt/solr", SEP, CONFIG_FILE_NAME) };
 
     WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
     WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS
@@ -242,13 +242,46 @@ public final class StaticStuff {
     }
   }
 
+  public static void sleep(final long duration, final TimeUnit unit) {
+    long millis = 0L;
+    int nanos = 0;
+
+    switch (unit) {
+    case SECONDS:
+      nanos = 0;
+      millis = duration * 1000;
+      break;
+    case MILLISECONDS:
+      nanos = 0;
+      millis = duration;
+      break;
+    case MINUTES:
+      nanos = 0;
+      millis = duration * 60000;
+      break;
+    case MICROSECONDS:
+      millis = 0;
+      nanos = (int) (duration * 1000);
+    case NANOSECONDS:
+      millis = 0;
+      nanos = (int) duration;
+    default:
+      throw new RuntimeException(String.format("Unit %s not valid.", unit.toString()));
+    }
+    try {
+      Thread.sleep(millis, nanos);
+    } catch (final InterruptedException e) {
+      log.warn("Sleep of {} {} interrupted!", duration, unit.toString(), e);
+    }
+  }
+
   /**
    * This method was obtained from the picocli project issue tracker. It causes
    * options in the automatically generated help/usage text to all be
-   * left-aligned. Without this, it indents two-character options further than the
-   * single-character options, which looks weird.
+   * left-aligned. Without this, it indents some options further than other
+   * options, which looks weird.
    *
-   * @return a factory object for help formatting.
+   * @return {@link IHelpFactory} object for usage formatting.
    */
   public static final IHelpFactory createLeftAlignedUsageHelp() {
     return new IHelpFactory() {
