@@ -38,18 +38,18 @@ public final class MainCommand {
 
   /** Debug option. */
   @Option(names = { "-v", "--verbose",
-      "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log any available debug messages.  Some commands may not have any debug logging defined.")
+      "--debug" }, arity = "0", scope = ScopeType.INHERIT, description = "Log any available debug messages.  Some commands may not have any debug logging defined.  Default '${DEFAULT-VALUE}'")
   private static boolean verbose;
-
-  /** Debug option. */
-  @Option(names = { "-f",
-      "--force" }, arity = "0", scope = ScopeType.INHERIT, description = "Force running as root, and as a side effect, allow binding to ports below 1024.")
-  private static boolean force;
 
   /** Service name option. */
   @Option(names = { "-sn",
-      "--service-name" }, arity = "1", scope = ScopeType.INHERIT, defaultValue = "solr", description = "The name of the service.  Default is 'solr'.")
+      "--service-name" }, arity = "1", scope = ScopeType.INHERIT, defaultValue = "solr", description = "The name of the service.  Default '${DEFAULT-VALUE}'")
   private static String serviceName = null;
+
+  /** Debug option. */
+  @Option(names = { "-f",
+      "--force" }, arity = "0", scope = ScopeType.INHERIT, description = "Force running as root, and as a side effect, allow binding to ports below 1024.  Default '${DEFAULT-VALUE}'")
+  private static boolean force;
 
   /**
    * The main method.

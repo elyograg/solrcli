@@ -20,7 +20,7 @@ public class StartCommand implements Runnable {
   };
 
   @Option(names = { "-c",
-      "--cloud" }, arity = "0", order = 10, description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.")
+      "--cloud" }, arity = "0", order = 10, description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.  Default '${DEFAULT-VALUE}'")
   private static boolean cloud;
 
   @Option(names = { "-z", "--zkhost",
@@ -32,8 +32,7 @@ public class StartCommand implements Runnable {
   private static List<String> properties;
 
   @Option(names = { "-p",
-      "--listen-port" }, arity = "1", order = 20, defaultValue = StaticStuff.DEFAULT_SOLR_PORT_STRING, description = "Solr Listen Port.  Default is "
-          + StaticStuff.DEFAULT_SOLR_PORT_STRING + " or what is defined in the config.")
+      "--listen-port" }, arity = "1", order = 20, defaultValue = StaticStuff.DEFAULT_SOLR_PORT_STRING, description = "Solr Listen Port.    Default '${DEFAULT-VALUE}' or what is defined in the config.")
   private static int listenPort;
 
   @Option(names = { "-sp", "--sp",
@@ -45,11 +44,11 @@ public class StartCommand implements Runnable {
   private static int zkPort = Integer.MIN_VALUE;
 
   @Option(names = { "-m", "--mem", "--memory",
-      "--heap" }, arity = "1", order = 30, defaultValue = "512m", description = "Solr Heap Size (values like 4g).")
+      "--heap" }, arity = "1", order = 30, defaultValue = "512m", description = "Solr Heap Size.   Default '${DEFAULT-VALUE}'")
   private static String heapSize;
 
   @Option(names = { "-gc",
-      "--gc" }, arity = "1", order = 40, defaultValue = "zgc", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default zgc")
+      "--gc" }, arity = "1", order = 40, defaultValue = "zgc", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default '${DEFAULT-VALUE}'")
   private static GcType gcName;
 
   @Override

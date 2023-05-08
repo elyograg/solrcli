@@ -19,16 +19,16 @@ public final class StopCommand implements Runnable {
 
   private static final class StopPorts {
     @Option(names = {
-        "-all", }, arity = "0", description = "Find and stop all running Solr servers on this host.")
+        "-all", }, arity = "0", description = "Find and stop all running Solr servers on this host.  Default '${DEFAULT-VALUE}'")
     boolean stopAll;
 
     @Option(names = { "-p",
-        "--port" }, arity = "1", description = "Specify the port the Solr HTTP listener is bound to.")
+        "--port" }, arity = "1", description = "Specify the port the Solr HTTP listener is bound to.  No default.")
     String port;
   }
 
   @Option(names = { "-k",
-      "--stop-key" }, arity = "1", description = "Stop key; default is 'SolrRocks' or what's defined in the config.")
+      "--stop-key" }, arity = "1", description = "Stop key.  Default '${DEFAULT-VALUE}' or what's defined in the config.")
   String stopKey;
 
   @Override

@@ -19,7 +19,7 @@ public class ZkCpCommand implements Runnable {
   String sourceFile;
   @Parameters(index = "1", description = "destination file")
   String destFile;
-  @Option(names = { "-r", "--recursive" }, description = "Recursively copy a directory")
+  @Option(names = { "-r", "--recursive" }, arity = "0", description = "Recursively copy a directory.  Default '${DEFAULT-VALUE}'")
   boolean recursive;
   @Option(names = { "-z", "--zkhost" }, description = "ZK connection string", required = true)
   String zkHost;
