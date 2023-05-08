@@ -25,6 +25,9 @@ public class InfoCommand implements Runnable {
     @Option(names = { "-props",
         "--props" }, description = "Print all Java System Properties and exit.")
     private static boolean printSysProps;
+
+    @Option(names = { "-env", "--env" }, description = "Print all environment variables and exit.")
+    private static boolean printEnv;
   }
 
   @Override
@@ -34,10 +37,20 @@ public class InfoCommand implements Runnable {
     if (InfoArgs.printSysProps) {
       final TreeSet<Object> sortedProps = new TreeSet<>();
       sortedProps.addAll(System.getProperties().keySet());
-      log.info("All system properties:");
+      log.info("All system properties (values wrapped in braces):\n");
       for (final Object o : sortedProps) {
         final String prop = (String) o;
         log.info("{}: {{}}", prop, System.getProperty(prop));
+      }
+      StaticStuff.exitProgram();
+    }
+
+    if (InfoArgs.printEnv) {
+      final TreeSet<String> sortedEnv = new TreeSet<>();
+      sortedEnv.addAll(System.getenv().keySet());
+      log.info("All environment variables (values wrapped in braces):\n");
+      for (final String env : sortedEnv) {
+        log.info("{}: {{}}", env, System.getenv(env));
       }
       StaticStuff.exitProgram();
     }

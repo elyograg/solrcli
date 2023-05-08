@@ -19,10 +19,6 @@ public class StartCommand implements Runnable {
     g1, zgc
   };
 
-  @Option(names = { "-f",
-      "--force" }, arity = "0", order = 999, description = "Force accepting port numbers below 1024, and/or starting Solr if it is run as root.  Not recommended.")
-  private static boolean forceRoot;
-
   @Option(names = { "-c",
       "--cloud" }, arity = "0", order = 10, description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.")
   private static boolean cloud;
@@ -66,14 +62,13 @@ public class StartCommand implements Runnable {
 
     log.info("Heap {}", heapSize);
     log.info("GC {}", gcName);
-    log.info("Listen Port {}", listenPort);
     if (stopPort == Integer.MIN_VALUE) {
       stopPort = listenPort - 1000;
     }
-    log.info("Stop Port {}", stopPort);
     if (cloud) {
       log.info("Start in SolrCloud mode");
       if (zkHost == null || zkHost.equals("")) {
+        log.info("Starting embedded ZK server");
         if (zkPort == Integer.MIN_VALUE) {
           zkPort = listenPort + 1000;
         }
@@ -88,7 +83,7 @@ public class StartCommand implements Runnable {
     log.info("listenPort {}, stopPort {}, zkPort {}", listenPort, stopPort, zkPort);
 
     int startPort = 1024;
-    if (forceRoot) {
+    if (StaticStuff.getForceFlag()) {
       log.warn("Forcing acceptance of low port numbers!");
       startPort = 1;
     }

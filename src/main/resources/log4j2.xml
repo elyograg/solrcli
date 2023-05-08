@@ -34,6 +34,7 @@
 	</Appenders>
 	<Loggers>
 		<AsyncLogger name="org.apache.logging.log4j" level="error" />
+		<AsyncLogger name="org.gradle" level="error" />
 		<AsyncRoot level="debug">
 			<AppenderRef ref="STDERR" />
 		</AsyncRoot>

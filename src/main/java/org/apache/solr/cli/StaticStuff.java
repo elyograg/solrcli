@@ -1,17 +1,26 @@
 package org.apache.solr.cli;
 
-import java.io.FileNotFoundException;
 import java.lang.invoke.MethodHandles;
 import java.nio.file.FileSystems;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Locale;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import picocli.CommandLine.Help;
+import picocli.CommandLine.Help.ColorScheme;
+import picocli.CommandLine.IHelpFactory;
+import picocli.CommandLine.Model.ArgSpec;
+import picocli.CommandLine.Model.CommandSpec;
 
 // TODO: Auto-generated Javadoc
 /**
@@ -35,29 +44,22 @@ public final class StaticStuff {
   /** The Constant SEP. */
   private static final String SEP = FileSystems.getDefault().getSeparator();
 
-  /** The Constant CONFIG_FILE_NAME. */
-  private static final String CONFIG_FILE_NAME = "solr.yml";
+  /** The configuration filename extension. */
+  private static final String CONFIG_FILENAME_EXTENSION = "yml";
 
-  private static AtomicBoolean debugFlag = new AtomicBoolean();
+  /** The verbose flag. */
+  private static AtomicBoolean verboseFlag = new AtomicBoolean(true);
+
+  /** The force flag. */
+  private static AtomicBoolean forceFlag = new AtomicBoolean(true);
 
   // TODO: Remove "." from these path lists.
 
-  /** The Constant WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS. */
-  private static final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS = {
-      System.getenv("SCRIPT_DIR") + SEP + CONFIG_FILE_NAME,
-      System.getProperty("user.home") + SEP + "." + CONFIG_FILE_NAME,
-      "C:\\Solr" + SEP + CONFIG_FILE_NAME, "." };
-
-  /** The Constant DEFAULT_CONFIG_FILE_LOCATIONS. */
-  private static final String[] DEFAULT_CONFIG_FILE_LOCATIONS = {
-      System.getenv("SCRIPT_DIR") + SEP + CONFIG_FILE_NAME,
-      System.getProperty("user.home") + SEP + "." + CONFIG_FILE_NAME,
-      "usr/local/share" + SEP + CONFIG_FILE_NAME, "usr/share/solr" + SEP + CONFIG_FILE_NAME,
-      "/etc/default" + SEP + CONFIG_FILE_NAME, "/var/solr" + SEP + CONFIG_FILE_NAME,
-      "/opt/solr" + SEP + CONFIG_FILE_NAME, "." };
-
-  /** The config file path. */
+  /** The configuration file path. */
   private static Path configFilePath;
+
+  /** The service name. */
+  private static String SERVICE_NAME = "solr";
 
   // External constants.
 
@@ -93,10 +95,8 @@ public final class StaticStuff {
    * @param configFileParam the location of the configuration file. Use null to
    *                        search the default locations.
    * @return whether or not the validation passed.
-   * @throws FileNotFoundException if a readable configuration file was not found.
    */
-  public static final boolean parseAndValidateConfig(final String configFileParam)
-      throws FileNotFoundException {
+  public static final boolean parseAndValidateConfig(final String configFileParam) {
     // TODO: Start with false when validation is working.
     final boolean validated = true;
 
@@ -110,7 +110,7 @@ public final class StaticStuff {
       }
 
       if (configFilePath == null) {
-        throw new FileNotFoundException("Unable to find config file!");
+        throw new RuntimeException("Unable to find config file!");
       }
 
       parseConfig(configFilePath);
@@ -138,19 +138,50 @@ public final class StaticStuff {
    * @return the path to the chosen configuration file.
    */
   private static final Path findConfigFile() {
+    final String CONFIG_FILE_NAME = String.format("%s.%s", SERVICE_NAME, CONFIG_FILENAME_EXTENSION);
     String configFile = null;
-    final String[] searchArray;
+    final List<String> WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS = Collections
+        .synchronizedList(new ArrayList<>());
+    final List<String> DEFAULT_CONFIG_FILE_LOCATIONS = Collections
+        .synchronizedList(new ArrayList<>());
+    final String[] COMMON_CONFIG_FILE_LOCATIONS_ARRAY = {
+        String.format("%s%s%s", System.getProperty("script.dir"), SEP, CONFIG_FILE_NAME),
+        String.format("%s%s.%s", System.getProperty("user.home"), SEP, CONFIG_FILE_NAME) };
+
+    // TODO: Remove the current directory from these location arrays.
+
+    final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
+        String.format("%s%s%s", "C:\\Solr", SEP, CONFIG_FILE_NAME), "." };
+    final String[] DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
+        String.format("%s%s%s", "/etc/default", SEP, CONFIG_FILE_NAME),
+        String.format("%s%s%s", "/usr/local/share", SEP, CONFIG_FILE_NAME),
+        String.format("%s%s%s", "/usr/share/solr", SEP, CONFIG_FILE_NAME),
+        String.format("%s%s%s", "/var/solr", SEP, CONFIG_FILE_NAME),
+        String.format("%s%s%s", "/opt/solr", SEP, CONFIG_FILE_NAME), "." };
+
+    WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
+    WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS
+        .addAll(Arrays.asList(WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));
+    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
+    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));
+    final List<String> searchList;
     if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).startsWith("windows")) {
-      searchArray = WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS;
+      searchList = WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS;
     } else {
-      searchArray = DEFAULT_CONFIG_FILE_LOCATIONS;
+      searchList = DEFAULT_CONFIG_FILE_LOCATIONS;
     }
 
-    for (final String f : searchArray) {
+    for (final String f : searchList) {
+      if (getVerboseFlag()) {
+        log.debug("Checking config location {}", f);
+      }
       if (Files.isReadable(Paths.get(f))) {
         configFile = f;
         break;
       }
+    }
+    if (configFile == null) {
+      throw new RuntimeException("Unable to find config file!");
     }
     return Paths.get(configFile);
   }
@@ -158,7 +189,7 @@ public final class StaticStuff {
   /**
    * Gets a configuration property.
    *
-   * @param propertyParam the property param
+   * @param propertyParam the property parameter
    * @return the property
    */
   public static final String getProperty(final String propertyParam) {
@@ -168,7 +199,7 @@ public final class StaticStuff {
   /**
    * Exit program.
    *
-   * @param code the code
+   * @param code the exit code to use
    */
   public static final void exitProgram(final int... code) {
     int exitCode = 0;
@@ -178,11 +209,112 @@ public final class StaticStuff {
     System.exit(exitCode);
   }
 
-  public static boolean getDebugFlag() {
-    return debugFlag.get();
+  public static boolean getVerboseFlag() {
+    return verboseFlag.get();
   }
 
-  public static void setDebugFlag(final boolean debug) {
-    debugFlag.set(debug);
+  public static void setVerboseFlag(final boolean debugParam) {
+    verboseFlag.set(debugParam);
+    if (getVerboseFlag()) {
+      log.debug("Setting debug {}", debugParam);
+    }
+  }
+
+  public static boolean getForceFlag() {
+    return forceFlag.get();
+  }
+
+  public static void setForceFlag(final boolean forceParam) {
+    forceFlag.set(forceParam);
+    if (getVerboseFlag()) {
+      log.debug("Setting force {}", forceParam);
+    }
+  }
+
+  public static String getServiceName() {
+    return SERVICE_NAME;
+  }
+
+  public static void setServiceName(final String nameParam) {
+    SERVICE_NAME = nameParam;
+    if (getVerboseFlag()) {
+      log.debug("Setting service name {}", nameParam);
+    }
+  }
+
+  /**
+   * This method was obtained from the picocli project issue tracker. It causes
+   * options in the automatically generated help/usage text to all be
+   * left-aligned. Without this, it indents two-character options further than the
+   * single-character options, which looks weird.
+   *
+   * @return a factory object for help formatting.
+   */
+  public static final IHelpFactory createLeftAlignedUsageHelp() {
+    return new IHelpFactory() {
+      private static final int COLUMN_REQUIRED_OPTION_MARKER_WIDTH = 2;
+      private static final int COLUMN_SHORT_OPTION_NAME_WIDTH = 2;
+      private static final int COLUMN_OPTION_NAME_SEPARATOR_WIDTH = 2;
+      private static final int COLUMN_LONG_OPTION_NAME_WIDTH = 22;
+
+      private static final int INDEX_REQUIRED_OPTION_MARKER = 0;
+      private static final int INDEX_SHORT_OPTION_NAME = 1;
+      private static final int INDEX_OPTION_NAME_SEPARATOR = 2;
+      private static final int INDEX_LONG_OPTION_NAME = 3;
+      private static final int INDEX_OPTION_DESCRIPTION = 4;
+
+      @Override
+      public Help create(final CommandSpec commandSpec, final ColorScheme colorScheme) {
+        return new Help(commandSpec, colorScheme) {
+          @Override
+          public Layout createDefaultLayout() {
+
+            // The default layout creates a TextTable with 5 columns, as follows:
+            // 0: empty text or (if configured) the requiredOptionMarker character
+            // 1: short option name
+            // 2: comma separator (if option has both short and long option)
+            // 3: long option name(s)
+            // 4: option description
+            //
+            // The code below creates a TextTable with 3 columns, as follows:
+            // 0: empty text or (if configured) the requiredOptionMarker character
+            // 1: all option names, comma-separated if necessary
+            // 2: option description
+
+            final int optionNamesColumnWidth = COLUMN_SHORT_OPTION_NAME_WIDTH
+                + COLUMN_OPTION_NAME_SEPARATOR_WIDTH + COLUMN_LONG_OPTION_NAME_WIDTH;
+
+            final TextTable table = TextTable.forColumnWidths(colorScheme,
+                COLUMN_REQUIRED_OPTION_MARKER_WIDTH, optionNamesColumnWidth,
+                commandSpec.usageMessage().width()
+                    - (optionNamesColumnWidth + COLUMN_REQUIRED_OPTION_MARKER_WIDTH));
+            final Layout result = new Layout(colorScheme, table, createDefaultOptionRenderer(),
+                createDefaultParameterRenderer()) {
+              @Override
+              public void layout(final ArgSpec argSpec, final Ansi.Text[][] cellValues) {
+
+                // The default option renderer produces 5 Text values for each option.
+                // Below we combine the short option name, comma separator and long option name
+                // into a single Text object, and we pass 3 Text values to the TextTable.
+                for (final Ansi.Text[] original : cellValues) {
+                  if (original[INDEX_OPTION_NAME_SEPARATOR].getCJKAdjustedLength() > 0) {
+                    original[INDEX_OPTION_NAME_SEPARATOR] = original[INDEX_OPTION_NAME_SEPARATOR]
+                        .concat(" ");
+                  }
+                  final Ansi.Text[] threeColumns = new Ansi.Text[] {
+                      original[INDEX_REQUIRED_OPTION_MARKER],
+                      original[INDEX_SHORT_OPTION_NAME]
+                          .concat(original[INDEX_OPTION_NAME_SEPARATOR])
+                          .concat(original[INDEX_LONG_OPTION_NAME]),
+                      original[INDEX_OPTION_DESCRIPTION], };
+                  table.addRowValues(threeColumns);
+                }
+              }
+            };
+            return result;
+          }
+        };
+      }
+    };
   }
 }
