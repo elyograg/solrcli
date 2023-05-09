@@ -172,9 +172,7 @@ public final class StaticStuff {
     }
 
     for (final String f : searchList) {
-      if (getVerboseFlag()) {
-        log.debug("Checking config location {}", f);
-      }
+      logDebug(log, "Checking config location {}", f);
       if (Files.isReadable(Paths.get(f))) {
         configFile = f;
         break;
@@ -215,9 +213,7 @@ public final class StaticStuff {
 
   public static void setVerboseFlag(final boolean debugParam) {
     verboseFlag.set(debugParam);
-    if (getVerboseFlag()) {
-      log.debug("Setting debug {}", debugParam);
-    }
+    logDebug(log, "Setting debug {}", debugParam);
   }
 
   public static boolean getForceFlag() {
@@ -226,9 +222,7 @@ public final class StaticStuff {
 
   public static void setForceFlag(final boolean forceParam) {
     forceFlag.set(forceParam);
-    if (getVerboseFlag()) {
-      log.debug("Setting force {}", forceParam);
-    }
+    logDebug(log, "Setting force {}", forceParam);
   }
 
   public static String getServiceName() {
@@ -237,9 +231,7 @@ public final class StaticStuff {
 
   public static void setServiceName(final String nameParam) {
     SERVICE_NAME = nameParam;
-    if (getVerboseFlag()) {
-      log.debug("Setting service name {}", nameParam);
-    }
+    logDebug(log, "Setting service name {}", nameParam);
   }
 
   public static void sleep(final long duration, final TimeUnit unit) {
@@ -349,5 +341,12 @@ public final class StaticStuff {
         };
       }
     };
+  }
+
+  public static void logDebug(final Logger loggerParam, final String format,
+      final Object... arguments) {
+    if (verboseFlag.get()) {
+      loggerParam.debug(format, arguments);
+    }
   }
 }
