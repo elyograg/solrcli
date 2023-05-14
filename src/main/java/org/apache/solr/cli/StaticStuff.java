@@ -29,9 +29,6 @@ import picocli.CommandLine.Model.CommandSpec;
  * A class that holds configuration info and constants. Everything that is not
  * actually needed by the rest of the program is intentionally set to private,
  * beginning with the configuration file path.
- *
- * TODO: Decide whether {@link Properties} is the right way to store
- * configuration data.
  */
 public final class StaticStuff {
   // Internal private stuff.
@@ -54,8 +51,6 @@ public final class StaticStuff {
   /** The force flag. */
   private static AtomicBoolean forceFlag = new AtomicBoolean(true);
 
-  // TODO: Remove "." from these path lists.
-
   /** The configuration file path. */
   private static Path configFilePath;
 
@@ -76,10 +71,15 @@ public final class StaticStuff {
   /** The Constant SYSPROP_STOPKEY. */
   public static final String SYSPROP_STOPKEY = "stopKey";
 
-  /** The Constant SYSPROP_STOPKEY. */
-  public static final String USAGE_OPTION_SEPARATOR_TEXT = "\nThe usage above shows an equal sign for separating an option and its value. A space also works, and for single-character options, no separator is required. Documentation will mostly use a space.";
+  /**
+   * The Constant USAGE_OPTION_SEPARATOR_TEXT.
+   */
+  public static final String USAGE_OPTION_SEPARATOR_TEXT = "\nThe usage above shows an equal sign for separating an option and its value."
+      + " A space also works, and for single-character options, the separator is optional."
+      + " Documentation will mostly use a space."
+      + " Use quotes to wrap values that contain spaces or other special characters.";
 
-  /** The Constant GC_ZGC_DEFAULT_OPTIONS. */
+  /** The Constant GC_ZGC_OPTIONS. */
   public static final String[] GC_ZGC_OPTIONS = { "-XX:+UnlockExperimentalVMOptions", "-XX:+UseZGC",
       "-XX:+ParallelRefProcEnabled", "-XX:+ExplicitGCInvokesConcurrent", "-XX:+AlwaysPreTouch",
       "-XX:+UseNUMA" };
@@ -116,9 +116,11 @@ public final class StaticStuff {
 
       parseConfig(configFilePath);
 
-      // TODO: Validate that all required sysProps and/or environment variables are
-      // correctly defined. If not, indicate what is missing or incorrect. Display
-      // requirements.
+      /*
+       * TODO: Validate, as much as possible, that the config file, sysProps, and/or
+       * environment variables are correctly defined. Report all problems that can be
+       * determined.  Change validated accordingly.
+       */
     }
     log.info("configFile {{}}", configFilePath);
     return validated;
@@ -258,7 +260,8 @@ public final class StaticStuff {
       millis = 0;
       nanos = (int) duration;
     default:
-      throw new RuntimeException(String.format("Unit %s not valid.", unit.toString()));
+      throw new RuntimeException(
+          String.format("Unit %s not valid for this implementation.", unit.toString()));
     }
     try {
       Thread.sleep(millis, nanos);

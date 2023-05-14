@@ -16,7 +16,7 @@ public class StartCommand implements Runnable {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   private static enum GcType {
-    g1, zgc
+    g1, zgc, custom
   };
 
   @Option(names = { "-c",
@@ -50,6 +50,10 @@ public class StartCommand implements Runnable {
   @Option(names = { "-gc",
       "--gc" }, arity = "1", order = 40, defaultValue = "zgc", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default '${DEFAULT-VALUE}'")
   private static GcType gcName;
+
+  @Option(names = { "-gcopt",
+      "--gc-option" }, arity = "1", order = 40, paramLabel = "\"<customGcOpt>\"", defaultValue = "zgc", description = "Custom GC tuning option.  Use multiple times for multiple options. Required if the -gc option is set to 'custom', ignored if another -gc option is used.")
+  private static List<String> customGc;
 
   @Override
   public void run() {

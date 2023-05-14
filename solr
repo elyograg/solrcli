@@ -16,7 +16,7 @@
 # limitations under the License.
 
 #-- set SCRIPT_DEBUG to get debug messages.
-REQUIRED_PROGS=(which realpath lsof gzip mktemp sudo su)
+REQUIRED_PROGS=(which dirname basename realpath lsof gzip mktemp sudo su)
 MINIMUM_JAVA_MAJOR_VERSION="11"
 JAR_FILE="build/libs/solrcli-all-0.0.1-SNAPSHOT.jar"
 LOG_FILE="solrcli.log"
@@ -129,6 +129,7 @@ function check_required_progs() {
     if [ ! -x "$(which "${PROG}")" ]; then
       log_err "Required program ${PROG} not in PATH!"
       PROG_MISSING="true"
+      break
     fi
   done
   if [ -n "${PROG_MISSING}" ]; then

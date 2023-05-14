@@ -27,8 +27,8 @@ public final class MainCommand {
   private static final Logger log = LoggerFactory.getLogger(MethodHandles.lookup().lookupClass());
 
   /** Help option. */
-  @Option(names = { "-h",
-      "--help" }, arity = "0", usageHelp = true, scope = ScopeType.INHERIT, description = "Display this command usage.")
+  @Option(names = { "-h", "--help",
+      "--usage" }, arity = "0", usageHelp = true, scope = ScopeType.INHERIT, description = "Display this command usage.")
   private static boolean help;
 
   /** Configuration file option. */
