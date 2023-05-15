@@ -119,7 +119,7 @@ public final class StaticStuff {
       /*
        * TODO: Validate, as much as possible, that the config file, sysProps, and/or
        * environment variables are correctly defined. Report all problems that can be
-       * determined.  Change validated accordingly.
+       * determined. Change validated accordingly.
        */
     }
     log.info("configFile {{}}", configFilePath);
@@ -161,11 +161,11 @@ public final class StaticStuff {
         String.format("%s%s%s", "/var/solr", SEP, CONFIG_FILE_NAME),
         String.format("%s%s%s", "/opt/solr", SEP, CONFIG_FILE_NAME) };
 
+    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
+    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));
     WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
     WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS
         .addAll(Arrays.asList(WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));
-    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
-    DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));
     final List<String> searchList;
     if (System.getProperty("os.name").toLowerCase(Locale.getDefault()).startsWith("windows")) {
       searchList = WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS;
@@ -180,9 +180,11 @@ public final class StaticStuff {
         break;
       }
     }
+
     if (configFile == null) {
       throw new RuntimeException("Unable to find config file!");
     }
+
     return Paths.get(configFile);
   }
 
