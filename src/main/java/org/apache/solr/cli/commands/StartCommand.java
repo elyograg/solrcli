@@ -20,39 +20,39 @@ public class StartCommand implements Runnable {
   };
 
   @Option(names = { "-c",
-      "--cloud" }, arity = "0", order = 10, description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.  Default '${DEFAULT-VALUE}'")
+      "--cloud" }, arity = "0", description = "Run Solr in SolrCloud mode.  If this option is present but -z is not present, Solr will start an embedded ZK server.  Default '${DEFAULT-VALUE}'")
   private static boolean cloud;
 
   @Option(names = { "-z", "--zkhost",
-      "--zkHost" }, arity = "1", order = 11, description = "ZK connection string.  See ZK docs for how to specify multiple hosts and a chroot.  Using this option forces cloud mode.")
+      "--zkHost" }, arity = "1", description = "ZK connection string.  See ZK docs for how to specify multiple hosts and a chroot.  Using this option forces cloud mode.")
   private static String zkHost;
 
   @Option(names = {
-      "-D" }, arity = "1", order = 15, paramLabel = "prop=\"prop value\"", description = "System Property.  Can be specified multiple times.  Also works just like the -D option for Java.  Quotes are required if the value contains spaces or other special characters.")
+      "-D" }, arity = "1", paramLabel = "prop=\"prop value\"", description = "System Property.  Can be specified multiple times.  Also works just like the -D option for Java.  Quotes are required if the value contains spaces or other special characters.")
   private static List<String> properties;
 
   @Option(names = { "-p",
-      "--listen-port" }, arity = "1", order = 20, defaultValue = StaticStuff.DEFAULT_SOLR_PORT_STRING, description = "Solr Listen Port.    Default '${DEFAULT-VALUE}' or what is defined in the config.")
+      "--listen-port" }, arity = "1", defaultValue = StaticStuff.DEFAULT_SOLR_PORT_STRING, description = "Solr Listen Port.    Default '${DEFAULT-VALUE}' or what is defined in the config.")
   private static int listenPort;
 
   @Option(names = { "-sp", "--sp",
-      "--stop-port" }, arity = "1", order = 21, description = "Solr Stop Port.  Default is listen port minus 1000.")
+      "--stop-port" }, arity = "1", description = "Solr Stop Port.  Default is listen port minus 1000.")
   private static int stopPort = Integer.MIN_VALUE;
 
   @Option(names = { "-zp", "--zp", "--zk-port",
-      "--zookeeper-port" }, arity = "1", order = 22, description = "Embedded ZooKeeper Port.  Default is listen port plus 1000.  Not used if not in cloud mode or -z option specified.")
+      "--zookeeper-port" }, arity = "1", description = "Embedded ZooKeeper Port.  Default is listen port plus 1000.  Not used if not in cloud mode or -z option specified.")
   private static int zkPort = Integer.MIN_VALUE;
 
   @Option(names = { "-m", "--mem", "--memory",
-      "--heap" }, arity = "1", order = 30, defaultValue = "512m", description = "Solr Heap Size.   Default '${DEFAULT-VALUE}'")
+      "--heap" }, arity = "1", defaultValue = "512m", description = "Solr Heap Size.   Default '${DEFAULT-VALUE}'")
   private static String heapSize;
 
   @Option(names = { "-gc",
-      "--gc" }, arity = "1", order = 40, defaultValue = "zgc", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default '${DEFAULT-VALUE}'")
+      "--gc" }, arity = "1", defaultValue = "zgc", description = "Garbage collector.  Valid values: ${COMPLETION-CANDIDATES}.  Default '${DEFAULT-VALUE}'")
   private static GcType gcName;
 
   @Option(names = { "-gcopt",
-      "--gc-option" }, arity = "1", order = 40, paramLabel = "\"<customGcOpt>\"", defaultValue = "zgc", description = "Custom GC tuning option.  Use multiple times for multiple options. Required if the -gc option is set to 'custom', ignored if another -gc option is used.")
+      "--gc-option" }, arity = "1", paramLabel = "\"<customGcOpt>\"", defaultValue = "zgc", description = "Custom GC tuning option.  Use multiple times for multiple options. Required if the -gc option is set to 'custom', ignored if another -gc option is used.")
   private static List<String> customGc;
 
   @Override
