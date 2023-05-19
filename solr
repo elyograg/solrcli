@@ -172,6 +172,7 @@ log_debug "Getting a temp file path."
 assign_temp_file "TMPFILE1"
 
 # Run the application with an option to print the log directory and immediately exit.
+# This serves a dual purpose -- validates that java and the application can run.
 log_debug "Getting the log directory"
 LOG_DIR="$("${JAVA_BIN}" "-Xmx${LOCAL_HEAP}" -jar "${JAR_FILE}" info --logdir 2> "${TMPFILE1}")"
 RET="$?"
