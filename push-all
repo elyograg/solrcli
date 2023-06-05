@@ -1,5 +1,0 @@
-#!/bin/sh
-
-# push to all remotes
-# Hopefully adding $@ will work correctly.
-git remote | xargs -L1 git push "$@" --all

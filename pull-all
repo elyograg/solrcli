@@ -1,4 +1,0 @@
-#!/bin/sh
-
-# pull from all remotes
-git pull --all "$@"
