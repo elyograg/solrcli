@@ -43,7 +43,7 @@ public final class StaticStuff {
   private static final String SEP = FileSystems.getDefault().getSeparator();
 
   /** The configuration filename extension. */
-  private static final String CONFIG_FILENAME_EXTENSION = "yml";
+  private static final String INCLUDE_FILENAME_EXTENSION = "properties";
 
   /** The verbose flag. */
   private static AtomicBoolean verboseFlag = new AtomicBoolean(true);
@@ -52,7 +52,7 @@ public final class StaticStuff {
   private static AtomicBoolean forceFlag = new AtomicBoolean(true);
 
   /** The configuration file path. */
-  private static Path configFilePath;
+  private static Path includeFilePath;
 
   /** The service name. */
   private static String SERVICE_NAME = "solr";
@@ -75,7 +75,7 @@ public final class StaticStuff {
    * The Constant USAGE_OPTION_SEPARATOR_TEXT.
    */
   public static final String USAGE_OPTION_SEPARATOR_TEXT = "\nThe usage above shows an equal sign for separating an option and its value."
-      + " A space also works, and for single-character options, the separator is optional."
+      + " A space also works, and for single-character options, the separator can be a space."
       + " Documentation will mostly use a space."
       + " Use quotes to wrap values that contain spaces or other special characters.";
 
@@ -97,24 +97,24 @@ public final class StaticStuff {
    *                        search the default locations.
    * @return whether or not the validation passed.
    */
-  public static final boolean parseAndValidateConfig(final String configFileParam) {
+  public static final boolean parseAndValidateInclude(final String configFileParam) {
     // TODO: Start with false when validation is working.
     final boolean validated = true;
 
     if (configFileParam == null || configFileParam.equals("")) {
-      configFilePath = findConfigFile();
+      includeFilePath = findIncludeFile();
     } else {
-      configFilePath = Paths.get(configFileParam);
-      if (!Files.isReadable(configFilePath)) {
-        log.error("Specified config file {} does not exist or is not readable.", configFilePath);
-        configFilePath = null;
+      includeFilePath = Paths.get(configFileParam);
+      if (!Files.isReadable(includeFilePath)) {
+        log.error("Specified config file {} does not exist or is not readable.", includeFilePath);
+        includeFilePath = null;
       }
 
-      if (configFilePath == null) {
+      if (includeFilePath == null) {
         throw new RuntimeException("Unable to find config file!");
       }
 
-      parseConfig(configFilePath);
+      parseInclude(includeFilePath);
 
       /*
        * TODO: Validate, as much as possible, that the config file, sysProps, and/or
@@ -122,7 +122,7 @@ public final class StaticStuff {
        * determined. Change validated accordingly.
        */
     }
-    log.info("configFile {{}}", configFilePath);
+    log.info("configFile {{}}", includeFilePath);
     return validated;
   }
 
@@ -131,7 +131,7 @@ public final class StaticStuff {
    *
    * @param configFile the full path to the configuration file
    */
-  private static final void parseConfig(final Path configFile) {
+  private static final void parseInclude(final Path configFile) {
     // TODO Implement
   }
 
@@ -141,25 +141,25 @@ public final class StaticStuff {
    *
    * @return the path to the chosen configuration file.
    */
-  private static final Path findConfigFile() {
-    final String CONFIG_FILE_NAME = String.format("%s.%s", SERVICE_NAME, CONFIG_FILENAME_EXTENSION);
+  private static final Path findIncludeFile() {
+    final String INCLUDE_FILE_NAME = String.format("%s.%s", SERVICE_NAME, INCLUDE_FILENAME_EXTENSION);
     String configFile = null;
     final List<String> WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS = Collections
         .synchronizedList(new ArrayList<>());
     final List<String> DEFAULT_CONFIG_FILE_LOCATIONS = Collections
         .synchronizedList(new ArrayList<>());
     final String[] COMMON_CONFIG_FILE_LOCATIONS_ARRAY = {
-        String.format("%s%s%s", System.getProperty("script.dir"), SEP, CONFIG_FILE_NAME),
-        String.format("%s%s.%s", System.getProperty("user.home"), SEP, CONFIG_FILE_NAME) };
+        String.format("%s%s%s", System.getProperty("script.dir"), SEP, INCLUDE_FILE_NAME),
+        String.format("%s%s.%s", System.getProperty("user.home"), SEP, INCLUDE_FILE_NAME) };
 
     final String[] WINDOWS_DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
-        String.format("%s%s%s", "C:\\Solr", SEP, CONFIG_FILE_NAME) };
+        String.format("%s%s%s", "C:\\Solr", SEP, INCLUDE_FILE_NAME) };
     final String[] DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY = {
-        String.format("%s%s%s", "/etc/default", SEP, CONFIG_FILE_NAME),
-        String.format("%s%s%s", "/usr/local/share", SEP, CONFIG_FILE_NAME),
-        String.format("%s%s%s", "/usr/share/solr", SEP, CONFIG_FILE_NAME),
-        String.format("%s%s%s", "/var/solr", SEP, CONFIG_FILE_NAME),
-        String.format("%s%s%s", "/opt/solr", SEP, CONFIG_FILE_NAME) };
+        String.format("%s%s%s", "/etc/default", SEP, INCLUDE_FILE_NAME),
+        String.format("%s%s%s", "/usr/local/share", SEP, INCLUDE_FILE_NAME),
+        String.format("%s%s%s", "/usr/share/solr", SEP, INCLUDE_FILE_NAME),
+        String.format("%s%s%s", "/var/solr", SEP, INCLUDE_FILE_NAME),
+        String.format("%s%s%s", "/opt/solr", SEP, INCLUDE_FILE_NAME) };
 
     DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(COMMON_CONFIG_FILE_LOCATIONS_ARRAY));
     DEFAULT_CONFIG_FILE_LOCATIONS.addAll(Arrays.asList(DEFAULT_CONFIG_FILE_LOCATIONS_ARRAY));

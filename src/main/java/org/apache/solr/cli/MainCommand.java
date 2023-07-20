@@ -31,10 +31,10 @@ public final class MainCommand {
       "--usage" }, arity = "0", usageHelp = true, scope = ScopeType.INHERIT, description = "Display this command usage.")
   private static boolean help;
 
-  /** Configuration file option. */
-  @Option(names = { "-cfg", "-config",
-      "--config" }, arity = "1", scope = ScopeType.INHERIT, description = "The location of the cross-platform config file.  If not present, program will search predefined paths for the file.")
-  private static String configFile = null;
+  /** Include file option. */
+  @Option(names = { "-i",
+      "--include" }, arity = "1", scope = ScopeType.INHERIT, description = "The location of the cross-platform config file.  If not present, program will search predefined paths for the file.")
+  private static String includeFile = null;
 
   /** Debug option. */
   @Option(names = { "-v", "--verbose",
@@ -44,11 +44,11 @@ public final class MainCommand {
   /** Service name option. */
   @Option(names = { "-sn",
       "--service-name" }, arity = "1", scope = ScopeType.INHERIT, defaultValue = "solr", description = "The name of the service.  Default '${DEFAULT-VALUE}'")
-  private static String serviceName = null;
+  private static String serviceName;
 
   /** Debug option. */
   @Option(names = { "-f",
-      "--force" }, arity = "0", scope = ScopeType.INHERIT, description = "Force running as root, and as a side effect, allow binding to ports below 1024.  Default '${DEFAULT-VALUE}'")
+      "--force" }, arity = "0", scope = ScopeType.INHERIT, description = "Force running as root, and as a side effect, allow binding to ports below 1024.  This is not enabled by default.")
   private static boolean force;
 
   /**
@@ -58,12 +58,15 @@ public final class MainCommand {
    */
   public static final void main(final String[] args) {
     final MainCommand app = new MainCommand();
-    new CommandLine(app).setHelpFactory(StaticStuff.createLeftAlignedUsageHelp())
+    final int exitCode = new CommandLine(app)
+        .setHelpFactory(StaticStuff.createLeftAlignedUsageHelp())
         .setExecutionStrategy(app::executionStrategy).execute(args);
+    System.exit(exitCode);
   }
 
   /**
-   * Do custom validation and enable logging here.
+   * Set flags, parse include file, and other things as part of the execution
+   * strategy.
    * 
    * @param parseResult
    * @return
@@ -72,7 +75,7 @@ public final class MainCommand {
     StaticStuff.setVerboseFlag(verbose);
     StaticStuff.setForceFlag(force);
     StaticStuff.setServiceName(serviceName);
-    if (!StaticStuff.parseAndValidateConfig(configFile)) {
+    if (!StaticStuff.parseAndValidateInclude(includeFile)) {
       throw new ParameterException(parseResult.commandSpec().commandLine(),
           String.format("Something is amiss with the config."));
     }
